@@ -5,7 +5,12 @@ pipeline {
             maven 'M2_HOME'
         }
 
-
+environment {
+    JAVA_HOME = tool name: 'jdk17', type: 'jdk' // ou 'jdk17' si tu utilises Java 17
+    M2_HOME = tool name: 'Maven 3', type: 'maven'
+    PATH = "${JAVA_HOME}/bin:${M2_HOME}/bin:${PATH}"
+    SONAR_HOST_URL = "http://192.167.33.10:9000"
+}
 
 
     stages {
