@@ -2,49 +2,69 @@ pipeline {
     agent any
 
     environment {
-        JAVA_HOME = tool name: 'jdk8', type: 'jdk'
-        M2_HOME = tool name: 'Maven 3', type: 'maven'
+        JAVA_HOME = tool name: 'JAVA_HOME', type: 'jdk'
+        M2_HOME = tool name: 'M2_HOME', type: 'maven'
         PATH = "${JAVA_HOME}/bin:${M2_HOME}/bin:${PATH}"
-        SONAR_HOST_URL = "http://192.167.33.10:9000"
     }
 
     stages {
-        stage('Checkout Backend Code') {
+        stage('GIT') {
             steps {
-                dir('backend') {
-                    git branch: 'AbdennebiSouhail-4TWIN2-G3',
-                        url: 'https://github.com/itsMoetaz/DevopsFinal.git'
-                }
+                git branch: 'BenKhedherMoetaz-4TWIN2-G3', url: 'https://github.com/itsMoetaz/4TWIN2_G3_kaddem.git'
             }
         }
 
-        stage('Clean, Build and Test') {
+        stage('Compile Stage') {
             steps {
-                dir('backend') {
-                    echo '🔧 Cleaning and testing project with Maven'
-                    sh 'mvn clean test'
-                }
+                sh 'mvn clean compile'
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Test Stage') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
+        stage('Maven Install') {
+            steps {
+                sh 'mvn install'
+            }
+        }
+
+        stage('MVN SONARQUBE') {
             steps {
                 script {
-                    def scannerHome = tool 'sonar'
-                    withSonarQubeEnv('sonar') {
-                        dir('backend') {
-                            sh """
-                                ${scannerHome}/bin/sonar-scanner \
-                                -Dsonar.projectKey=kaddem \
-                                -Dsonar.projectName='Kaddem' \
-                                -Dsonar.sources=src/main \
-                                -Dsonar.tests=src/test \
-                                -Dsonar.java.binaries=target/classes \
-                                -Dsonar.scm.provider=git
-                            """
-                        }
+                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                        sh "mvn sonar:sonar -Dsonar.login=${SONAR_TOKEN} -Dmaven.test.skip=true"
                     }
                 }
+            }
+        }
+
+        stage('Nexus Deployment') {
+            steps {
+                script {
+                    def artifactExists = sh(
+                        script: '''
+                            curl -s -o /dev/null -w "%{http_code}" -u admin:admin "http://192.167.33.10:8081/repository/maven-public/tn/esprit/spring/services/timesheet-devops/1.0/timesheet-devops-1.0.jar"
+                        ''',
+                        returnStdout: true
+                    ).trim()
+
+                    if (artifactExists != '200') {
+                        echo 'Artifact not found. Deploying to Nexus...'
+                        sh 'mvn deploy -Dmaven.test.skip=true'
+                    } else {
+                        echo 'Artifact already exists on Nexus; skipping deployment.'
+                    }
+                }
+            }
+        }
+
+        stage('docker image Stage') {
+            steps {
+                sh 'docker build -t timesheet:1.0.0 .'
             }
         }
     }
