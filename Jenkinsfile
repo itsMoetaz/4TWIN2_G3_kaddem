@@ -2,9 +2,11 @@ pipeline {
     agent any
 
     environment {
-        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
-        PATH = "${JAVA_HOME}/bin:${env.PATH}"
-    }
+            JAVA_HOME = tool name: 'JAVA_HOME', type: 'jdk'
+            M2_HOME = tool name: 'Maven 3', type: 'maven'
+            PATH = "${JAVA_HOME}/bin:${M2_HOME}/bin:${PATH}"
+            SONAR_HOST_URL = "http://192.167.33.10:9000" // Ensure SonarQube is running
+        }
 
     stages {
         stage('Checkout Backend Code') {
