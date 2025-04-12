@@ -1,12 +1,17 @@
 pipeline {
     agent any
+    tools {
+            jdk 'JAVA_HOME'
+            maven 'M2_HOME'
+        }
 
     environment {
-            JAVA_HOME = tool name: 'JAVA_HOME', type: 'jdk'
-            M2_HOME = tool name: 'Maven 3', type: 'maven'
-            PATH = "${JAVA_HOME}/bin:${M2_HOME}/bin:${PATH}"
-            SONAR_HOST_URL = "http://192.167.33.10:9000" // Ensure SonarQube is running
+        JAVA_HOME = tool name: 'JAVA_HOME', type: 'jdk'
+
+        PATH = "${JAVA_HOME}/bin:${M2_HOME}/bin:${PATH}"
+        SONAR_HOST_URL = "http://192.167.33.10:9000" // Ensure SonarQube is running
         }
+
 
     stages {
         stage('Checkout Backend Code') {
