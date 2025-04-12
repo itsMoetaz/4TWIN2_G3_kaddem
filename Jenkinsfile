@@ -42,30 +42,30 @@ pipeline {
             }
         }
 
-        stage('Nexus Deployment') {
-            steps {
-                script {
-                    def artifactExists = sh(
-                        script: '''
-                            curl -s -o /dev/null -w "%{http_code}" -u admin:admin "http://192.167.33.10:8081/repository/maven-public/tn/esprit/spring/services/timesheet-devops/1.0/timesheet-devops-1.0.jar"
-                        ''',
-                        returnStdout: true
-                    ).trim()
+        // stage('Nexus Deployment') {
+        //     steps {
+        //         script {
+        //             def artifactExists = sh(
+        //                 script: '''
+        //                     curl -s -o /dev/null -w "%{http_code}" -u admin:admin "http://192.167.33.10:8081/repository/maven-public/tn/esprit/spring/services/timesheet-devops/1.0/timesheet-devops-1.0.jar"
+        //                 ''',
+        //                 returnStdout: true
+        //             ).trim()
 
-                    if (artifactExists != '200') {
-                        echo 'Artifact not found. Deploying to Nexus...'
-                        sh 'mvn deploy -Dmaven.test.skip=true'
-                    } else {
-                        echo 'Artifact already exists on Nexus; skipping deployment.'
-                    }
-                }
-            }
-        }
+        //             if (artifactExists != '200') {
+        //                 echo 'Artifact not found. Deploying to Nexus...'
+        //                 sh 'mvn deploy -Dmaven.test.skip=true'
+        //             } else {
+        //                 echo 'Artifact already exists on Nexus; skipping deployment.'
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('docker image Stage') {
-            steps {
-                sh 'docker build -t timesheet:1.0.0 .'
-            }
-        }
+        // stage('docker image Stage') {
+        //     steps {
+        //         sh 'docker build -t timesheet:1.0.0 .'
+        //     }
+        // }
     }
 }
