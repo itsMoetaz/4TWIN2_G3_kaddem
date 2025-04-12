@@ -6,9 +6,7 @@ pipeline {
         }
 
 
-    environment {
 
-    }
 
     stages {
         stage('Checkout Backend Code') {
