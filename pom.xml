@@ -94,11 +94,11 @@
 
     <!-- Deploy to Nexus -->
     <distributionManagement>
-        <repository>
+        <snapshotRepository>
             <id>deploymentRepo</id>
-            <name>Nexus Repository</name>
+            <name>Nexus Snapshot Repository</name>
             <url>http://localhost:8081/repository/maven-snapshots/</url>
-        </repository>
+        </snapshotRepository>
     </distributionManagement>
 
     <build>
