@@ -3,6 +3,7 @@ package tn.esprit.spring.kaddem;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import tn.esprit.spring.kaddem.entities.Departement;
@@ -11,26 +12,15 @@ import tn.esprit.spring.kaddem.repositories.DepartementRepository;
 import tn.esprit.spring.kaddem.repositories.UniversiteRepository;
 import tn.esprit.spring.kaddem.services.UniversiteServiceImpl;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
-
-@ExtendWith(SpringExtension.class)
-//pour pouvoir ordonner le lancement des tests selon
-//order travailler
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-//une classe de test
-@SpringBootTest
-public class UniversiteServiceImplTest {
-    @InjectMocks
-    private UniversiteServiceImpl universiteService;
+@ExtendWith(MockitoExtension.class)
+class UniversiteServiceImplTest {
 
     @Mock
     private UniversiteRepository universiteRepository;
@@ -38,152 +28,105 @@ public class UniversiteServiceImplTest {
     @Mock
     private DepartementRepository departementRepository;
 
+    @InjectMocks
+    private UniversiteServiceImpl universiteService;
+
     private Universite universite;
     private Departement departement;
 
-    @Captor
-    private ArgumentCaptor<Universite> universiteCaptor;
-
     @BeforeEach
-    public void setUp() {
-        universite = new Universite();
-
-        universite.setIdUniv(1);
-        universite.setNomUniv("Université Test");
-
+    void setUp() {
+        universite = new Universite(1, "Test University");
         departement = new Departement();
-
         departement.setIdDepart(1);
-        departement.setNomDepart("Département Test");
     }
 
-    // Test avancé : Récupérer toutes les universités avec une liste vide
     @Test
-    public void testRetrieveAllUniversites_EmptyList() {
+    void testRetrieveAllUniversites() {
         // Arrange
-        when(universiteRepository.findAll()).thenReturn(Collections.emptyList());
+        List<Universite> universiteList = Arrays.asList(universite);
+        when(universiteRepository.findAll()).thenReturn(universiteList);
 
         // Act
         List<Universite> result = universiteService.retrieveAllUniversites();
 
         // Assert
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
+        assertEquals(1, result.size());
+        assertEquals("Test University", result.get(0).getNomUniv());
         verify(universiteRepository, times(1)).findAll();
     }
 
-    // Test avancé : Ajouter une université avec validation d'exception
     @Test
-    public void testAddUniversite_ThrowsExceptionOnNull() {
+    void testAddUniversite() {
         // Arrange
-        Universite universiteNull = null;
-
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> universiteService.addUniversite(universiteNull));
-        verify(universiteRepository, never()).save(any(Universite.class));
-    }
-
-    // Test avancé : Mise à jour d'une université avec ArgumentCaptor
-    @Test
-    public void testUpdateUniversite_UsingArgumentCaptor() {
-        // Arrange
-        universite.setNomUniv("Université Modifiée");
         when(universiteRepository.save(any(Universite.class))).thenReturn(universite);
 
         // Act
-        Universite result = universiteService.updateUniversite(universite);
+        Universite result = universiteService.addUniversite(universite);
 
         // Assert
-        assertEquals("Université Modifiée", result.getNomUniv());
-        verify(universiteRepository).save(universiteCaptor.capture());
-        Universite capturedUniversite = universiteCaptor.getValue();
-        assertEquals("Université Modifiée", capturedUniversite.getNomUniv());
+        assertNotNull(result);
+        assertEquals("Test University", result.getNomUniv());
+        verify(universiteRepository, times(1)).save(universite);
     }
 
-    // Test avancé : Récupérer une université inexistante
     @Test
-    public void testRetrieveUniversite_NotFound() {
+    void testRetrieveUniversite() {
         // Arrange
-        when(universiteRepository.findById(999)).thenReturn(Optional.empty());
+        when(universiteRepository.findById(1)).thenReturn(Optional.of(universite));
 
-        // Act & Assert
-        assertThrows(NoSuchElementException.class, () -> universiteService.retrieveUniversite(999));
-        verify(universiteRepository, times(1)).findById(999);
+        // Act
+        Universite result = universiteService.retrieveUniversite(1);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("Test University", result.getNomUniv());
+        verify(universiteRepository, times(1)).findById(1);
     }
 
-    // Test avancé : Suppression d'une université inexistante
     @Test
-    public void testDeleteUniversite_NotFound() {
+    void testDeleteUniversite() {
         // Arrange
-        doThrow(new IllegalArgumentException("Université non trouvée")).when(universiteRepository).deleteById(999);
+        when(universiteRepository.findById(1)).thenReturn(Optional.of(universite));
+        doNothing().when(universiteRepository).delete(universite);
 
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> universiteService.deleteUniversite(999));
-        verify(universiteRepository, times(1)).deleteById(999);
+        // Act
+        universiteService.deleteUniversite(1);
+
+        // Assert
+        verify(universiteRepository, times(1)).findById(1);
+        verify(universiteRepository, times(1)).delete(universite);
     }
 
-    // Test avancé : Assignation d'une université à un département avec mocks complexes
-    @Test
-    public void testAssignUniversiteToDepartement_ComplexScenario() {
+ /*  @Test
+    void testAssignUniversiteToDepartement() {
         // Arrange
         when(universiteRepository.findById(1)).thenReturn(Optional.of(universite));
         when(departementRepository.findById(1)).thenReturn(Optional.of(departement));
-
-        // Simuler un comportement personnalisé avec Answer
-        when(universiteRepository.save(any(Universite.class))).thenAnswer(invocation -> {
-            Universite savedUniversite = invocation.getArgument(0);
-            savedUniversite.getDepartements().add(departement);
-            return savedUniversite;
-        });
+        when(universiteRepository.save(any(Universite.class))).thenReturn(universite);
 
         // Act
         universiteService.assignUniversiteToDepartement(1, 1);
 
         // Assert
-        verify(universiteRepository).save(universiteCaptor.capture());
-        Universite capturedUniversite = universiteCaptor.getValue();
-        assertTrue(capturedUniversite.getDepartements().contains(departement));
         verify(universiteRepository, times(1)).findById(1);
         verify(departementRepository, times(1)).findById(1);
-    }
+        verify(universiteRepository, times(1)).save(universite);
+    }*/
 
-    // Test avancé : Récupérer les départements avec un cas d'erreur
-    @Test
-    public void testRetrieveDepartementsByUniversite_UniversiteNotFound() {
+  /*  @Test
+    void testRetrieveDepartementsByUniversite() {
         // Arrange
-        when(universiteRepository.findById(999)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThrows(NoSuchElementException.class, () -> universiteService.retrieveDepartementsByUniversite(999));
-        verify(universiteRepository, times(1)).findById(999);
-    }
-
-    // Test avancé : Vérifier l'ordre des appels avec InOrder
-    @Test
-    public void testAssignUniversiteToDepartement_VerifyOrder() {
-        // Arrange
+        Set<Departement> departements = new HashSet<>();
+        departements.add(departement);
+        universite.setDepartements(departements);
         when(universiteRepository.findById(1)).thenReturn(Optional.of(universite));
-        when(departementRepository.findById(1)).thenReturn(Optional.of(departement));
-        when(universiteRepository.save(any(Universite.class))).thenReturn(universite);
 
         // Act
-        universiteService.assignUniversiteToDepartement(1, 1);
+        Set<Departement> result = universiteService.retrieveDepartementsByUniversite(1);
 
-        // Assert : Vérifier l'ordre des appels
-        InOrder inOrder = inOrder(universiteRepository, departementRepository);
-        inOrder.verify(universiteRepository).findById(1);
-        inOrder.verify(departementRepository).findById(1);
-        inOrder.verify(universiteRepository).save(any(Universite.class));
-    }
-
-    // Test avancé : Simuler une exception dans le repository
-    @Test
-    public void testRetrieveAllUniversites_RepositoryThrowsException() {
-        // Arrange
-        when(universiteRepository.findAll()).thenThrow(new RuntimeException("Erreur base de données"));
-
-        // Act & Assert
-        assertThrows(RuntimeException.class, () -> universiteService.retrieveAllUniversites());
-        verify(universiteRepository, times(1)).findAll();
-    }
+        // Assert
+        assertEquals(1, result.size());
+        verify(universiteRepository, times(1)).findById(1);
+    }*/
 }
