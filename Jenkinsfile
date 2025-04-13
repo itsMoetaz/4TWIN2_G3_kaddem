@@ -10,14 +10,12 @@ pipeline {
 
 
              stages {
-            stage('Checkout Backend Code') {
-                steps {
-                    dir('backend') {
-                        git branch: 'AbdennebiSouhail-4TWIN2-G3',
-                            url: 'https://github.com/itsMoetaz/4TWIN2_G3_kaddem.git'
+              stages {
+                    stage('GIT') {
+                        steps {
+                            git branch: 'AbdennebiSouhail-4TWIN2-G3', url: 'https://github.com/itsMoetaz/4TWIN2_G3_kaddem.git'
+                        }
                     }
-                }
-            }
 
         stage('Maven Clean Compile') {
                     steps {
