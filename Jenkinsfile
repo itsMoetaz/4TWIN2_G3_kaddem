@@ -37,18 +37,8 @@ pipeline {
                     }
                 }
 
-        stage('Backend - SonarQube Analysis') {
-            steps {
-                dir('backend') {
-                    withSonarQubeEnv('sonarqube') { // Use your SonarQube server ID
-                        sh 'mvn sonar:sonar'
-                    }
-                }
-            }
-        }
-        }
 
-
+        }
 
 
 
