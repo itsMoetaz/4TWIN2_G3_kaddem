@@ -1,6 +1,6 @@
 pipeline {
     agent any
-
+    
     environment {
         JAVA_HOME = tool name: 'JAVA_HOME', type: 'jdk'
         M2_HOME = tool name: 'M2_HOME', type: 'maven'
@@ -57,7 +57,7 @@ pipeline {
                         echo 'Artifact not found. Deploying to Nexus...'
                         sh 'mvn deploy -Dmaven.test.skip=true'
                     } else {
-                        echo 'Artifact already exists on Nexus; skipping deployment.'
+                        echo 'Artifact already exists on Nexus; skipping deployment. '
                     }
                 }
             }
