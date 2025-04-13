@@ -1,14 +1,4 @@
-# Étape 1 : Build de l'application
-FROM maven:3.9.9-openjdk-17 AS build
-WORKDIR /app
-COPY pom.xml .
-RUN mvn dependency:go-offline
-COPY src ./src
-RUN mvn package -DskipTests
-
-# Étape 2 : Image finale pour exécuter l'application
-FROM openjdk:17-jdk-slim
-WORKDIR /app
-COPY --from=build /app/target/kaddem-0.0.1-SNAPSHOT.jar app.jar
-EXPOSE 8083
-ENTRYPOINT ["java", "-jar", "app.jar"]
+FROM openjdk:8-jdk-alpine
+EXPOSE 8089
+ADD http://192.168.33.10:8081/repository/maven-snapshots/tn/esprit/spring/kaddem/0.0.1-SNAPSHOT/kaddem-0.0.1-20250413.231621-1.jar malekswissi4twin2-1.0.jar
+ENTRYPOINT ["java","-jar","/malekswissi4twin2-1.0.jar"]
