@@ -54,7 +54,7 @@ pipeline {
                     ).trim()
 
                     if (artifactExists != '200') {
-                        echo 'Artifact not found. Deploying to Nexus...'
+                        echo 'Artifact not found. Deploying to Nexus..'
                         sh 'mvn deploy -Dmaven.test.skip=true'
                     } else {
                         echo 'Artifact already exists on Nexus; skipping deployment. '
