@@ -48,7 +48,7 @@ pipeline {
                 script {
                     def artifactExists = sh(
                         script: '''
-                            curl -s -o /dev/null -w "%{http_code}" -u admin:admin "http://192.167.33.10:8081/repository/maven-public/tn/esprit/spring/kaddem/4TWIN2-G3-KADDEM/4TWIN2-G3-KADDEM.jar"
+                            curl -s -o /dev/null -w "%{http_code}" -u admin:admin "http://192.167.33.10:8081/repository/maven-public/tn/esprit/spring/kaddem/0.0.1-SNAPSHOT/4TWIN2-G3-KADDEM.jar"
                         ''',
                         returnStdout: true
                     ).trim()

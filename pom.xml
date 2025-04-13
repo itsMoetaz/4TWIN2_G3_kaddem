@@ -71,6 +71,8 @@
 	</distributionManagement>
 
     <build>
+        <finalName>4TWIN2-G3-kaddem</finalName>
+
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
