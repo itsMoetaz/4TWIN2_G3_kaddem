@@ -1,26 +1,33 @@
 package tn.esprit.spring.kaddem;
-
 import org.junit.jupiter.api.*;
-
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-
-
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 import tn.esprit.spring.kaddem.entities.Departement;
 import tn.esprit.spring.kaddem.entities.Universite;
 import tn.esprit.spring.kaddem.repositories.DepartementRepository;
 import tn.esprit.spring.kaddem.repositories.UniversiteRepository;
 import tn.esprit.spring.kaddem.services.UniversiteServiceImpl;
 
-import java.util.*;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+
+@SpringBootTest
 @ExtendWith(MockitoExtension.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+
 class UniversiteServiceImplTest {
 
     @Mock
