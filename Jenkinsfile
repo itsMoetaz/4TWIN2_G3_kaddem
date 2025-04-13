@@ -79,6 +79,37 @@ pipeline {
                 sh "docker tag ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ${DOCKER_IMAGE_NAME}:latest"
             }
         }
+
+            stage('Push Docker Image to DockerHub') {
+            steps {
+                sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                sh "docker push ${DOCKER_IMAGE_NAME}:latest"
+            }
+        }
+
+        stage('Deploy with Docker Compose') {
+            steps {
+                script {
+                    sh """
+                    sed -i 's|image: saifmed/saifmeddeb4twin2:.*|image: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}|' docker-compose.yml
+                    """
+
+                    sh 'docker-compose down'
+                    sh 'docker-compose up -d'
+                }
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                sh 'docker-compose down'
+                sh 'docker system prune -f'
+            }
+        }
+    }
+
+
+        
         
     }
 }
