@@ -45,7 +45,7 @@ pipeline {
                 script {
                     try {
                         sh '''
-                            mvn deploy --settings ${MAVEN_SETTINGS} -DskipTests
+                            mvn deploy  -DskipTests
                         '''
                     } catch (Exception e) {
                         echo "Deployment to Nexus failed: ${e.message}"
