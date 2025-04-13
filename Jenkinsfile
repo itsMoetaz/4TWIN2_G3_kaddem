@@ -28,7 +28,7 @@ pipeline {
                 sh 'mvn clean compile' // Compile the project
             }
         }
-   /*     stage('Test') {
+   /*   stage('Test') {
             steps {
                 sh 'mvn test' // Run tests
             }
