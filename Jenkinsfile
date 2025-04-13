@@ -6,6 +6,10 @@ pipeline {
         PATH = "${JAVA_HOME}/bin:${M2_HOME}/bin:${PATH}"
         NEXUS_REPO_URL = "http://127.0.0.1:8081/repository/maven-releases/"
         MAVEN_SETTINGS = "/usr/share/maven/conf/settings.xml"
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
+
+        DOCKER_IMAGE_NAME = 'malekswissi11/malekswissi4twin2'
+        DOCKER_IMAGE_TAG = "${BUILD_NUMBER}"
     }
     stages {
         stage('Git Checkout') {
@@ -62,6 +66,19 @@ stage('Deploy to Nexus') {
         }
     }
 }
+
+        stage('Docker Login') {
+            steps {
+                sh 'echo "$DOCKERHUB_CREDENTIALS_PSW" | docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+                sh "docker tag ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ${DOCKER_IMAGE_NAME}:latest"
+            }
+        }
         
     }
 }
