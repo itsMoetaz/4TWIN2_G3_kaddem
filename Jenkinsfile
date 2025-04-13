@@ -33,12 +33,13 @@ pipeline {
         }
 
         stage('MVN SONARQUBE') {
-            steps {
-                withSonarQubeEnv(installationName: 'sq') {
-                    sh './mvnw clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
-                }
-            }
+    steps {
+        withSonarQubeEnv('sq') {
+            sh 'mvn clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar -DskipTests'
         }
+    }
+}
+
 
         // stage('Nexus Deployment') {
         //     steps {
