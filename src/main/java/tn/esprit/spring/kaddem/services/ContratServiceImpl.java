@@ -48,7 +48,7 @@ ContratRepository contratRepository;
 		Etudiant e=etudiantRepository.findByNomEAndPrenomE(nomE, prenomE);
 		Contrat ce=contratRepository.findByIdContrat(idContrat);
 		Set<Contrat> contrats= e.getContrats();
-		Integer nbContratssActifs= (Integer) 0;
+		Integer nbContratssActifs=0;
 		if (contrats.size()!=0) {
 			for (Contrat contrat : contrats) {
 				if (((contrat.getArchive())!=null)&& ((contrat.getArchive())!=false))  {
@@ -80,7 +80,7 @@ ContratRepository contratRepository;
 				}
 				if (difference_In_Days==0) {
 					contratsAarchiver.add(contrat);
-					contrat.setArchive(Boolean.valueOf(true));
+					contrat.setArchive(true);
 					contratRepository.save(contrat);
 				}
 			}
