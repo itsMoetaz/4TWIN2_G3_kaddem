@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -7,47 +6,45 @@ pipeline {
         maven 'M2_HOME'
     }
 
-
-
-             stages {
-            stage('Checkout Backend Code') {
-                steps {
-                    dir('backend') {
-                        git branch: 'AbdennebiSouhail-4TWIN2-G3',
-                            url: 'https://github.com/itsMoetaz/4TWIN2_G3_kaddem.git'
-                    }
+    stages {
+        stage('Checkout Backend Code') {
+            steps {
+                dir('backend') {
+                    git branch: 'AbdennebiSouhail-4TWIN2-G3',
+                        url: 'https://github.com/itsMoetaz/4TWIN2_G3_kaddem.git'
                 }
             }
+        }
 
         stage('Maven Clean Compile') {
-                    steps {
-                    dir('backend') {
-                        sh 'mvn clean'
-                        echo 'Running Maven Compile'
-                        sh 'mvn compile'
-                    }
-                    }
+            steps {
+                dir('backend') {
+                    sh 'mvn clean'
+                    echo 'Running Maven Compile'
+                    sh 'mvn compile'
                 }
+            }
+        }
 
-                stage('Tests - JUnit/Mockito') {
-                    steps {
-                    dir('backend') {
-                        sh 'mvn test'
-                    }
-                    }
+        stage('Tests - JUnit/Mockito') {
+            steps {
+                dir('backend') {
+                    sh 'mvn test'
                 }
-                 stage('Build package') {
-                                    steps {
-                                        sh 'mvn package'
-                                    }
-                                }
-                                stage('Maven Install') {
-                                    steps {
-                                        sh 'mvn install'
-                                    }
-                                }
-
-
+            }
+        }
+        
+        stage('Build package') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+        
+        stage('Maven Install') {
+            steps {
+                sh 'mvn install'
+            }
+        }
 
         stage('Backend - SonarQube Analysis') {
             steps {
@@ -76,9 +73,20 @@ pipeline {
                 }
             }
         }
+    }
 
+    post {
+        always {
+            emailext (
+                subject: "Build Status: ${currentBuild.fullDisplayName}",
+                body: """
+                    <p>Build Status: ${currentBuild.currentResult}</p>
+                    <p>Build Number: ${env.BUILD_NUMBER}</p>
+                    <p>Check the build console output at: ${env.BUILD_URL}</p>
+                """,
+                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
+                to: 'souhailabdennebi2@gmail.com'
+            )
         }
-
-
-
+    }
 }
