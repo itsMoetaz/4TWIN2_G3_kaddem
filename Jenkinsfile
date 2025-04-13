@@ -36,6 +36,16 @@ pipeline {
                     }
                     }
                 }
+                 stage('Build package') {
+                                    steps {
+                                        sh 'mvn package'
+                                    }
+                                }
+                                stage('Maven Install') {
+                                    steps {
+                                        sh 'mvn install'
+                                    }
+                                }
 
         stage('Backend - SonarQube Analysis') {
             steps {
@@ -58,23 +68,12 @@ pipeline {
         }
 
         stage('Nexus Deployment') {
-                    steps {
-                        script {
-                            def artifactExists = sh(
-                                script: '''
-                                    curl -s -o /dev/null -w "%{http_code}" -u admin:admin "http://192.167.33.10:8081/repository/maven-public/tn/esprit/spring/kaddem/0.0.1-SNAPSHOT/kaddem-0.0.1-20250413.001931-1.jar"
-                                ''',
-                                returnStdout: true
-                            ).trim()
-
-                            if (artifactExists != '200') {
-                                echo 'Artifact not found. Deploying to Nexus...'
-                                sh 'mvn deploy -Dmaven.test.skip=true'
-                            } else {
-                                echo 'Artifact already exists on Nexus; skipping deployment.'
-                            }
-                        }
-                    }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                    sh 'mvn deploy -Dmaven.test.skip=true -Drepository.username=$NEXUS_USERNAME -Drepository.password=$NEXUS_PASSWORD'
+                }
+            }
+        }
                 }
         }
 
