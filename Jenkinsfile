@@ -32,13 +32,17 @@ pipeline {
             }
         }
 
-        stage('MVN SONARQUBE') {
+stage('MVN SONARQUBE') {
     steps {
         withSonarQubeEnv('sq') {
-            sh 'mvn clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar -DskipTests'
+            sh '''
+                mvn clean compile
+                mvn sonar:sonar -DskipTests -Dsonar.java.binaries=target/classes
+            '''
         }
     }
 }
+
 
 
         // stage('Nexus Deployment') {
