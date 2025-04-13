@@ -40,16 +40,16 @@ pipeline {
         }
 
 
-  stage('Deploy to Nexus') {
+ stage('Deploy to Nexus') {
             steps {
                 script {
                     try {
                         sh '''
-                            mvn deploy  -DskipTests
+                            mvn deploy --settings ${MAVEN_SETTINGS} -DskipTests
                         '''
                     } catch (Exception e) {
                         echo "Deployment to Nexus failed: ${e.message}"
-                        throw e 
+                        throw e
                     }
                 }
             }
