@@ -32,24 +32,16 @@ pipeline {
             }
         }
 
-stage('MVN SONARQUBE') {
-    steps {
-        withSonarQubeEnv('sq') {
-            sh '''
-                mvn clean compile
-                mvn sonar:sonar -DskipTests -Dsonar.java.binaries=target/classes
-            '''
+        stage('MVN SONARQUBE') {
+            steps {
+                withSonarQubeEnv('sq') {
+                    sh '''
+                        mvn clean compile
+                        mvn sonar:sonar -DskipTests -Dsonar.java.binaries=target/classes
+                    '''
+                }
+            }
         }
-    }
-}
-
-
-        // stage('Deploy to Nexus') {
-        //     steps {
-        //         echo 'Deploying to Nexus Repository'
-        //         sh 'mvn deploy -Dmaven.test.skip=true'
-        //     }
-        // }
 
         stage('Nexus Deployment') {
             steps {
