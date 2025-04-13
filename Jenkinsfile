@@ -37,7 +37,25 @@ pipeline {
                     }
                 }
 
-
+        stage('Backend - SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'scanner' // Make sure 'scanner' is configured in Jenkins
+                    withSonarQubeEnv('sonar') { // Using your server ID 'sonar'
+                        dir('backend') {
+                            sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=kaddem \
+                            -Dsonar.projectName='kaddem' \
+                            -Dsonar.sources=src/main \
+                            -Dsonar.java.binaries=target/classes \
+                            -Dsonar.scm.provider=git
+                            """
+                        }
+                    }
+                }
+            }
+        }
         }
 
 
