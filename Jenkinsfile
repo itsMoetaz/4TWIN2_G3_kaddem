@@ -34,10 +34,8 @@ pipeline {
 
         stage('MVN SONARQUBE') {
             steps {
-                script {
-                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                        sh "mvn sonar:sonar -Dsonar.login=${SONAR_TOKEN} -Dmaven.test.skip=true"
-                    }
+                withsonarQubeEnv(installationName: 'sq') {
+                    sh './mvnw clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
                 }
             }
         }
