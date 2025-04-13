@@ -63,10 +63,14 @@ pipeline {
             }
         }
 
-        // stage('docker image Stage') {
-        //     steps {
-        //         sh 'docker build -t timesheet:1.0.0 .'
-        //     }
-        // }
+        stage('Docker Build & Run') {
+            steps {
+                script {
+                    def imageName = "moetazbenkhedher/4twin2-g3-kaddem"
+                    sh "docker build -t ${imageName}:latest ."
+                }
+            }
+        }
+
     }
 }
