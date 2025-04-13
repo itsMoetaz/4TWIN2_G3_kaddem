@@ -14,7 +14,7 @@ pipeline {
                 steps {
                     dir('backend') {
                         git branch: 'AbdennebiSouhail-4TWIN2-G3',
-                            url: 'https://github.com/itsMoetaz/DevopsFinal.git'
+                            url: 'https://github.com/itsMoetaz/4TWIN2_G3_kaddem.git'
                     }
                 }
             }
