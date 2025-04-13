@@ -39,23 +39,16 @@ pipeline {
 
         stage('Backend - SonarQube Analysis') {
             steps {
-                script {
-                    def scannerHome = tool 'scanner'
-                    withSonarQubeEnv('scanner') {
-                        dir('backend') {
-                            sh """
-                            ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=kaddem \
-                            -Dsonar.projectName='Kaddem' \
-                            -Dsonar.sources=src/main \
-                            -Dsonar.java.binaries=target/classes \
-                            -Dsonar.scm.provider=git
-                            """
-                        }
+                dir('backend') {
+                    withSonarQubeEnv('sonarqube') { // Use your SonarQube server ID
+                        sh 'mvn sonar:sonar'
                     }
-                     }
                 }
-        }}
+            }
+        }
+        }
+
+
 
 
 
