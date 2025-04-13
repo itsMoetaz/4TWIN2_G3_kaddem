@@ -44,7 +44,7 @@ pipeline {
         }
 
 
-stage('Deploy to Nexus') {
+/*stage('Deploy to Nexus') {
     steps {
         script {
             withCredentials([usernamePassword(credentialsId: 'nexus-credentials-id', 
@@ -65,7 +65,7 @@ stage('Deploy to Nexus') {
             }
         }
     }
-}
+}*/
 
         stage('Docker Login') {
             steps {
