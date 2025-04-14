@@ -87,21 +87,16 @@ pipeline {
         }
       
 
+
      stage('Push Docker Image to DockerHub') {
-    steps {
-        script {
-            try {
-                echo "Pushing ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}..."
+            steps {
                 sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
-                echo "Pushing ${DOCKER_IMAGE_NAME}:latest..."
                 sh "docker push ${DOCKER_IMAGE_NAME}:latest"
-            } catch (Exception e) {
-                echo "Failed to push image: ${e}"
-                error "Docker push failed"
             }
         }
-    }
-}
+
+
+        
         
     stage('Deploy with Docker Compose') {
             steps {
