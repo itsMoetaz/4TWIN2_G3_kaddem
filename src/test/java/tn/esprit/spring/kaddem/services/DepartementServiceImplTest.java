@@ -4,10 +4,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tn.esprit.spring.kaddem.dto.DepartementDTO;
 import tn.esprit.spring.kaddem.entities.Departement;
 import tn.esprit.spring.kaddem.entities.Etudiant;
 import tn.esprit.spring.kaddem.repositories.DepartementRepository;
-import tn.esprit.spring.kaddem.services.DepartementServiceImpl;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class DepartementServiceImplTest {
+class DepartementServiceImplTest {
 
     @Mock
     private DepartementRepository departementRepository;
@@ -30,6 +30,7 @@ public class DepartementServiceImplTest {
 
     private Departement departement;
     private Etudiant etudiant;
+    private DepartementDTO departementDTO;
 
     @BeforeEach
     void setUp() {
@@ -37,6 +38,7 @@ public class DepartementServiceImplTest {
         etudiant = new Etudiant(1, "John", "Doe", null);
         etudiant.setDepartement(departement);
         departement.setEtudiants(new HashSet<>(Arrays.asList(etudiant)));
+        departementDTO = new DepartementDTO(1, "Informatique");
     }
 
     @Test
@@ -65,12 +67,12 @@ public class DepartementServiceImplTest {
         when(departementRepository.save(any(Departement.class))).thenReturn(departement);
 
         // Act
-        Departement result = departementService.addDepartement(departement);
+        DepartementDTO result = departementService.addDepartement(departementDTO);
 
         // Assert
         assertNotNull(result);
         assertEquals("Informatique", result.getNomDepart());
-        verify(departementRepository, times(1)).save(departement);
+        verify(departementRepository, times(1)).save(any(Departement.class));
     }
 
     @Test
@@ -114,15 +116,17 @@ public class DepartementServiceImplTest {
     @Order(6)
     void testUpdateDepartement() {
         // Arrange
-        departement.setNomDepart("Informatique Modifié");
-        when(departementRepository.save(any(Departement.class))).thenReturn(departement);
+        DepartementDTO updatedDTO = new DepartementDTO(1, "Informatique Modifié");
+        when(departementRepository.findById(1)).thenReturn(Optional.of(departement));
+        when(departementRepository.save(any(Departement.class))).thenReturn(new Departement(1, "Informatique Modifié"));
 
         // Act
-        Departement result = departementService.updateDepartement(departement);
+        DepartementDTO result = departementService.updateDepartement(updatedDTO);
 
         // Assert
         assertNotNull(result);
         assertEquals("Informatique Modifié", result.getNomDepart());
+        verify(departementRepository, times(1)).findById(1);
         verify(departementRepository, times(1)).save(any(Departement.class));
     }
 
