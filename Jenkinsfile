@@ -94,5 +94,31 @@ pipeline {
                 }
             }
         }
+
+            post {
+                success {
+                    emailext(
+                        subject: "✅ Jenkins Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                        body: """<p>Good news! The build was successful.</p>
+                                 <p><b>Project:</b> ${env.JOB_NAME}<br>
+                                 <b>Build #:</b> ${env.BUILD_NUMBER}</p>
+                                 <p><a href="${env.BUILD_URL}">View Build</a></p>""",
+                        to: 'moetaz.khedher2001@gmail.com',
+                        mimeType: 'text/html'
+                    )
+                }
+                failure {
+                    emailext(
+                        subject: "❌ Jenkins Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                        body: """<p><b>Project:</b> ${env.JOB_NAME}<br>
+                                 <b>Build #:</b> ${env.BUILD_NUMBER}</p>
+                                 <p>Status: FAILED</p>
+                                 <p><a href="${env.BUILD_URL}">View Build</a></p>""",
+                        to: 'moetaz.khedher2001@gmail.com',
+                        mimeType: 'text/html'
+                    )
+                }
+            }
+
     }
 }
