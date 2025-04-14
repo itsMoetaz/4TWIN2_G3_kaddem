@@ -83,14 +83,16 @@ pipeline {
             }
         }
 
-         stage('Docker Compose Up') {
-             steps {
-                 script {
-                   echo 'Running Docker Compose...'
-                        sh 'docker-compose down || true'
-                        sh 'docker-compose up -d --build'
-                   }
-             }
-         }
+        stage('Docker Compose Up') {
+            steps {
+                script {
+                    echo '🛠️ Stopping any existing containers...'
+                    sh 'docker compose down || true'
+
+                    echo '🚀 Building and starting containers with Docker Compose...'
+                    sh 'docker compose up -d --build'
+                }
+            }
+        }
     }
 }
