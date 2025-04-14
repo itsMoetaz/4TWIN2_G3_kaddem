@@ -38,13 +38,13 @@ pipeline {
         }
 
         // Uncomment this if you want to run tests
-        /*
+        
         stage('Test') {
             steps {
                 sh 'mvn test'
             }
         }
-        */
+        
 
         stage('Install') {
             steps {
@@ -52,7 +52,7 @@ pipeline {
             }
         }
 
-        stage('Docker Login') {
+    /*    stage('Docker Login') {
             steps {
                 sh 'echo "$DOCKERHUB_CREDENTIALS_PSW" | docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin'
             }
@@ -89,6 +89,6 @@ pipeline {
                 sh 'docker compose down'
                 sh 'docker system prune -f'
             }
-        }
+        }*/
     }
 }
