@@ -68,12 +68,7 @@ pipeline {
                 sh "docker tag ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ${DOCKER_IMAGE_NAME}:latest"
             }
         }
-        stage('Push Docker Image to DockerHub') {
-            steps {
-                sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
-                sh "docker push ${DOCKER_IMAGE_NAME}:latest"
-            }
-        }
+      
 
      stage('Push Docker Image to DockerHub') {
     steps {
