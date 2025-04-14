@@ -20,10 +20,10 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/kaddemdb
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: null
+      SPRING_DATASOURCE_PASSWORD: ""
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    volumes:
+      - mysql_data:/var/lib/mysql
 
-      volumes:
-     mysql_data:
-
- 
+volumes:
+  mysql_data:
