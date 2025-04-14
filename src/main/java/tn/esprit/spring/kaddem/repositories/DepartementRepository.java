@@ -6,7 +6,4 @@ import tn.esprit.spring.kaddem.entities.Departement;
 
 @Repository
 public interface DepartementRepository extends CrudRepository<Departement,Integer> {
-
-
-
 }
