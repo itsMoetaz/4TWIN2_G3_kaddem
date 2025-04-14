@@ -118,43 +118,12 @@ pipeline {
               }
 
     }
-     post {
+      post {
              success {
-                 echo '✅ Pipeline completed successfully!'
-                 emailext(
-                     subject: "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                     body: """Hello Souhail,
-
-     🎉 Your Jenkins build succeeded!
-
-     Job: ${env.JOB_NAME}
-     Build Number: ${env.BUILD_NUMBER}
-     URL: ${env.BUILD_URL}
-
-     Regards,
-     Jenkins CI
-     """,
-                     to: 'souhailabdennebi2@gmail.com'
-                 )
+                 echo 'Pipeline succeeded!'
              }
              failure {
-                 echo '❌ Pipeline failed.'
-                 emailext(
-                     subject: "❌ FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                     body: """Hello Souha,
-
-     😢 Your Jenkins build failed.
-
-     Job: ${env.JOB_NAME}
-     Build Number: ${env.BUILD_NUMBER}
-     URL: ${env.BUILD_URL}
-
-     Please check the logs for more details.
-
-     Regards,
-     Jenkins CI
-     """,
-                     to: 'souhailabdennebi2@gmail.com'
-                 )
+                 echo 'Pipeline failed!'
              }
+         }
          }
