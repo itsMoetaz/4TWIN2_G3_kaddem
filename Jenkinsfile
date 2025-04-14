@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('GIT') {
             steps {
-                git branch: 'main',
+                git branch: 'JendoubiMalek-4TWIN2-G3',
                     url: 'https://github.com/itsMoetaz/4TWIN2_G3_kaddem.git'
             }
         }
