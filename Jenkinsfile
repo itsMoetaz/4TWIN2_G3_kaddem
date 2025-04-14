@@ -37,21 +37,16 @@ pipeline {
                 sh 'mvn install'
             }
         }
-        stage('Deploy to Nexus') {
+         stage('Deploy to Nexus') {
             steps {
                 script {
                     try {
-                        echo "Déploiement vers Nexus en utilisant ${MAVEN_SETTINGS}"
-
-                        sh """
-                            mvn deploy \
-                                --settings ${MAVEN_SETTINGS} \
-                                -DskipTests \
-                                -DaltDeploymentRepository=nexus-snapshots::default::${NEXUS_REPO_URL}
-                        """
+                        sh '''
+                            mvn deploy --settings ${MAVEN_SETTINGS} -DskipTests
+                        '''
                     } catch (Exception e) {
-                        echo "Échec du déploiement vers Nexus: ${e.message}"
-                        error "Le déploiement a échoué. Vérifiez le fichier settings.xml et la configuration Nexus."
+                        echo "Deployment to Nexus failed: ${e.message}"
+                        throw e 
                     }
                 }
             }
