@@ -6,6 +6,10 @@ pipeline {
         maven 'M2_HOME'
     }
 
+     environment {
+            DOCKER_IMAGE = 'souhail210301/4twin2-g3-kaddem:latest'
+        }
+
     stages {
         stage('GIT') {
             steps {
@@ -72,7 +76,44 @@ pipeline {
 
               }
           }
+
+          stage('Build Docker Image') {
+              steps {
+                  script {
+                      sh 'docker build -t souhail210301/4twin2-g3-kaddem:latest .'
+                  }
+              }
+          }
+
+          stage('Push to Docker Hub') {
+              steps {
+                  script {
+                      def imageExists = sh(
+                          script: 'curl -s -o /dev/null -w "%{http_code}" -u $DOCKER_USERNAME:$DOCKER_PASSWORD "https://hub.docker.com/v2/repositories/souhail210301/4twin2-g3-kaddem/tags/latest/"',
+                          returnStdout: true
+                      ).trim()
+
+                      if (imageExists != '200') {
+                          withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                              sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                              sh 'docker push souhail210301/4twin2-g3-kaddem:latest'
+                          }
+                      } else {
+                          echo 'Docker image already exists on Docker Hub; skipping push.'
+                      }
+                  }
+              }
+          }
+
     }
+    post {
+            success {
+                echo '✅ Pipeline completed successfully!'
+            }
+            failure {
+                echo '❌ Pipeline failed.'
+            }
+        }
 
 
 }

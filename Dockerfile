@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the jar file from Maven build
-COPY target/kaddem-0.0.1-SNAPSHOT.jar app.jar
+COPY target/kaddem-1.0.jar app.jar
 
 # Expose port (adjust if different)
 EXPOSE 8089
