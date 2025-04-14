@@ -107,12 +107,31 @@ pipeline {
 
     }
     post {
-            success {
-                echo '✅ Pipeline completed successfully!'
-            }
-            failure {
-                echo '❌ Pipeline failed.'
-            }
+        success {
+            echo '✅ Pipeline completed successfully!'
+            emailext(
+                subject: '✅ Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}',
+                body: """
+                    <p>Hey Souha 👋</p>
+                    <p>Le build <b>${env.JOB_NAME} #${env.BUILD_NUMBER}</b> a été <b>réussi</b> ! 🎉</p>
+                    <p>Voir les détails ici : <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                """,
+                to: 'souhailabdennebi2@gmail.com',
+                mimeType: 'text/html'
+            )
+        }
+        failure {
+            echo '❌ Pipeline failed.'
+            emailext(
+                subject: '❌ Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}',
+                body: """
+                    <p>Hey Souha 👋</p>
+                    <p>Le build <b>${env.JOB_NAME} #${env.BUILD_NUMBER}</b> a <b>échoué</b> 😢</p>
+                    <p>Voir les logs ici : <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                """,
+                to: 'souhailabdennebi2@gmail.com',
+                mimeType: 'text/html'
+            )
         }
 
 
