@@ -64,21 +64,17 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                script {
-                    // Si vous utilisez l'Option 1 (COPY), cette étape est suffisante
-                    sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
-
-                    // Si vous utilisez l'Option 2 (téléchargement depuis Nexus), ajoutez les identifiants Nexus
-                    /*
-                    withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-                        sh "docker build --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
-                    }
-                    */
-
-                    sh "docker tag ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ${DOCKER_IMAGE_NAME}:latest"
-                }
+                sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+                sh "docker tag ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ${DOCKER_IMAGE_NAME}:latest"
             }
         }
+        stage('Push Docker Image to DockerHub') {
+            steps {
+                sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                sh "docker push ${DOCKER_IMAGE_NAME}:latest"
+            }
+        }
+
      stage('Push Docker Image to DockerHub') {
     steps {
         script {
