@@ -99,7 +99,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    sed -i 's|image: malekswissi11/testdevops :.*|image: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}|' docker-compose.yml
+                    sed -i 's|image: malekswissi11/testdevops:.*|image: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}|' docker-compose.yml
                     """
 
                     sh 'docker-compose down'
