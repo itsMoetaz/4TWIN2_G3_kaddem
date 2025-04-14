@@ -19,7 +19,15 @@ pipeline {
                 sh 'mvn clean compile'
             }
         }
-
+  stage('Deploy to Nexus') {
+            steps {
+                script {
+                    sh """
+                    mvn deploy -DaltDeploymentRepository=nexus::default::http://192.168.56.10:8081/repository/maven-releases/
+                    """
+                }
+            }
+        }
        
 
      
