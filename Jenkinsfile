@@ -105,9 +105,8 @@ pipeline {
                          <b>Build #:</b> ${env.BUILD_NUMBER}</p>
                          <p><a href="${env.BUILD_URL}">View Build</a></p>""",
                 to: 'moetaz.khedher2001@gmail.com',
-                mimeType: 'text/html'
+                mimeType: 'text/html',
                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
-
             )
         }
         failure {
@@ -118,7 +117,7 @@ pipeline {
                          <p>Status: FAILED</p>
                          <p><a href="${env.BUILD_URL}">View Build</a></p>""",
                 to: 'moetaz.khedher2001@gmail.com',
-                mimeType: 'text/html'
+                mimeType: 'text/html',
                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
             )
         }
