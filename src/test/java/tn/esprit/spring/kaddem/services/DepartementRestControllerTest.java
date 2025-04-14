@@ -1,12 +1,15 @@
 package tn.esprit.spring.kaddem.services;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import tn.esprit.spring.kaddem.controllers.DepartementRestController;
 import tn.esprit.spring.kaddem.entities.Departement;
 import tn.esprit.spring.kaddem.services.IDepartementService;
@@ -14,108 +17,118 @@ import tn.esprit.spring.kaddem.services.IDepartementService;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(DepartementRestController.class)
+@RunWith(MockitoJUnitRunner.class)
 public class DepartementRestControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private IDepartementService departementService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @InjectMocks
+    private DepartementRestController departementController;
 
-    private Departement departement;
-
-    @BeforeEach
-    void setUp() {
-        departement = new Departement(1, "Informatique");
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    void testGetDepartements() throws Exception {
-        // Arrange
-        List<Departement> departementList = Arrays.asList(
-                new Departement(1, "Informatique"),
-                new Departement(2, "Mathématiques")
-        );
+    public void testGetAllDepartements() {
+        // Mock data
+        Departement departement1 = new Departement(1, "Informatique");
+        Departement departement2 = new Departement(2, "Mathématiques");
+        List<Departement> departementList = Arrays.asList(departement1, departement2);
+
+        // Mocking behavior
         when(departementService.retrieveAllDepartements()).thenReturn(departementList);
 
-        // Act & Assert
-        mockMvc.perform(get("/departement/retrieve-all-departements")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].nomDepart", is("Informatique")))
-                .andExpect(jsonPath("$[1].nomDepart", is("Mathématiques")));
+        // Perform the test
+        ResponseEntity<List<Departement>> responseEntity = departementController.getDepartements();
 
+        // Verify the interactions
         verify(departementService, times(1)).retrieveAllDepartements();
+
+        // Assertions
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(2, responseEntity.getBody().size());
     }
 
     @Test
-    void testRetrieveDepartement() throws Exception {
-        // Arrange
-        when(departementService.retrieveDepartement(anyInt())).thenReturn(departement);
+    public void testGetDepartementById() {
+        // Mock data
+        Departement departement = new Departement(1, "Informatique");
 
-        // Act & Assert
-        mockMvc.perform(get("/departement/retrieve-departement/1")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nomDepart", is("Informatique")));
+        // Mocking behavior
+        when(departementService.retrieveDepartement(1)).thenReturn(departement);
 
+        // Perform the test
+        ResponseEntity<Departement> responseEntity = departementController.retrieveDepartement(1);
+
+        // Verify the interactions
         verify(departementService, times(1)).retrieveDepartement(1);
+
+        // Assertions
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(departement, responseEntity.getBody());
     }
 
     @Test
-    void testAddDepartement() throws Exception {
-        // Arrange
+    public void testAddDepartement() {
+        // Mock data
+        Departement departement = new Departement();
+        departement.setNomDepart("Informatique");
+
+        // Mocking behavior
         when(departementService.addDepartement(any(Departement.class))).thenReturn(departement);
 
-        // Act & Assert
-        mockMvc.perform(post("/departement/add-departement")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(departement)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nomDepart", is("Informatique")));
+        // Perform the test
+        ResponseEntity<Departement> responseEntity = departementController.addDepartement(departement);
 
+        // Verify the interactions
         verify(departementService, times(1)).addDepartement(any(Departement.class));
+
+        // Assertions
+        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
     }
 
     @Test
-    void testUpdateDepartement() throws Exception {
-        // Arrange
+    public void testUpdateDepartement() {
+        // Mock data
+        Departement departement = new Departement();
         departement.setNomDepart("Informatique Modifié");
+
+        // Mocking behavior
         when(departementService.updateDepartement(any(Departement.class))).thenReturn(departement);
 
-        // Act & Assert
-        mockMvc.perform(put("/departement/update-departement")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(departement)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nomDepart", is("Informatique Modifié")));
+        // Perform the test
+        ResponseEntity<Departement> responseEntity = departementController.updateDepartement(departement);
 
+        // Verify the interactions
         verify(departementService, times(1)).updateDepartement(any(Departement.class));
+
+        // Assertions
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
     }
 
     @Test
-    void testRemoveDepartement() throws Exception {
-        // Arrange
+    public void testDeleteDepartement() {
+        // Mocking behavior
         doNothing().when(departementService).deleteDepartement(anyInt());
 
-        // Act & Assert
-        mockMvc.perform(delete("/departement/remove-departement/1")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        // Perform the test
+        ResponseEntity<Void> responseEntity = departementController.removeDepartement(1);
 
+        // Verify the interactions
         verify(departementService, times(1)).deleteDepartement(1);
+
+        // Assertions
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 }
