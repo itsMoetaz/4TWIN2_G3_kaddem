@@ -105,7 +105,6 @@ pipeline {
                          <b>Build #:</b> ${env.BUILD_NUMBER}</p>
                          <p><a href="${env.BUILD_URL}">View Build</a></p>""",
                 to: 'moetaz.khedher2001@gmail.com',
-                from: 'moetaz.khedher2001@gmail.com',
                 mimeType: 'text/html'
             )
         }
@@ -117,7 +116,6 @@ pipeline {
                          <p>Status: FAILED</p>
                          <p><a href="${env.BUILD_URL}">View Build</a></p>""",
                 to: 'moetaz.khedher2001@gmail.com',
-                from: 'moetaz.khedher2001@gmail.com',
                 mimeType: 'text/html'
             )
         }
