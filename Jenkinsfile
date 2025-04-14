@@ -7,7 +7,7 @@ pipeline {
     }
 
     stages {
-        stage('Checkout Backend Code') {
+        stage('GIT') {
             steps {
                 dir('backend') {
                     git branch: 'AbdennebiSouhail-4TWIN2-G3',
@@ -46,7 +46,7 @@ pipeline {
             }
         }
 
-        stage('Backend - SonarQube Analysis') {
+        stage('SonarQube Analysis') {
             steps {
                 script {
                     def scannerHome = tool 'scanner' // Make sure 'scanner' is configured in Jenkins
