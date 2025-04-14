@@ -6,12 +6,12 @@ services:
     restart: unless-stopped
     environment:
       - MYSQL_ROOT_PASSWORD=
-      - MYSQL_DATABASE=timesheet_db
+      - MYSQL_DATABASE=kaddemdb
     ports:
       - 3306:3306
     volumes:
       - db:/var/lib/mysql
-  app-timesheet:
+  app-kaddemdb:
     depends_on:
       - mysqldb
     image: malekjendoubi/kaddem:1.0.0
