@@ -1,4 +1,5 @@
 package tn.esprit.spring.kaddem.services;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -78,9 +79,6 @@ class DepartementServiceImplTest {
     @Test
     @Order(3)
     void testAddDepartementWithNullShouldFail() {
-        // Arrange
-        when(departementRepository.save(null)).thenThrow(new IllegalArgumentException("Departement cannot be null"));
-
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> departementService.addDepartement(null));
         verify(departementRepository, never()).save(any(Departement.class));
@@ -174,5 +172,27 @@ class DepartementServiceImplTest {
         assertEquals(1, retrievedEtudiants.size());
         assertTrue(retrievedEtudiants.contains(etudiant));
         verify(departementRepository, times(1)).findById(1);
+    }
+
+    @Test
+    @Order(10)
+    void testUpdateDepartementWithInvalidId() {
+        // Arrange
+        DepartementDTO invalidDTO = new DepartementDTO(999, "Informatique Modifié");
+        when(departementRepository.findById(999)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(RuntimeException.class, () -> departementService.updateDepartement(invalidDTO));
+        verify(departementRepository, times(1)).findById(999);
+        verify(departementRepository, never()).save(any(Departement.class));
+    }
+
+    @Test
+    @Order(11)
+    void testUpdateDepartementWithNullShouldFail() {
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> departementService.updateDepartement(null));
+        verify(departementRepository, never()).findById(anyInt());
+        verify(departementRepository, never()).save(any(Departement.class));
     }
 }
