@@ -26,11 +26,11 @@ pipeline {
                 sh 'mvn --version'
             }
         }
-        stage('Compile') {
+      /*  stage('Compile') {
             steps {
                 sh 'mvn clean compile || exit 1'
             }
-        }
+        }*/
         stage('Install') {
             steps {
                 sh 'mvn install'
