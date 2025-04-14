@@ -19,7 +19,25 @@ pipeline {
                 sh 'mvn clean compile'
             }
         }
+ stage('MVN SONARQUBE') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                        sh "mvn sonar:sonar -Dsonar.login=${SONAR_TOKEN} -Dmaven.test.skip=true"
+                    }
+                }
+            }
+        }
 
+        stage('Deploy to Nexus') {
+            steps {
+                script {
+                    sh """
+                    mvn deploy -DaltDeploymentRepository=nexus::default::http://192.168.56.10:8082/repository/maven-releases/
+                    """
+                }
+            }
+        }
 
         stage('Build Docker Image') {
                     steps {
