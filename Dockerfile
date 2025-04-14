@@ -1,10 +1,18 @@
-FROM maven:3.8.7-openjdk-17 AS build
-WORKDIR /app
-COPY . .
-RUN mvn clean package -DskipTests
+# Étape 1 : utiliser une image Java légère
+FROM openjdk:17-jdk-slim
 
-FROM openjdk:17-slim
-WORKDIR target/kaddem-0.0.1-SNAPSHOT
-COPY --from=build /app/target/kaddem-0.0.1-SNAPSHOT.jar app.jar
+# Variable d'environnement
+ENV SPRING_OUTPUT_ANSI_ENABLED=ALWAYS \
+    JAVA_OPTS=""
+
+# Créer un dossier dans le container
+WORKDIR /app
+
+# Copier le JAR compilé
+COPY target/kaddem-0.0.1-SNAPSHOT.jar app.jar
+
+# Exposer le port utilisé par Spring Boot
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "kaddem-0.0.1-SNAPSHOT.jar"]
+
+# Commande de démarrage
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
