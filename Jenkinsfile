@@ -37,6 +37,27 @@ pipeline {
             }
         }
 
+              
+         stage('Deploy to Nexus') {
+             steps {
+                script {
+                     try {
+                         echo "Déploiement vers Nexus en utilisant ${MAVEN_SETTINGS}"
+
+                         sh """
+                            mvn deploy \
+                                 --settings ${MAVEN_SETTINGS} \
+                               -DskipTests \
+                                -DaltDeploymentRepository=nexus-snapshots::default::${NEXUS_REPO_URL}
+                        """
+                    } catch (Exception e) {
+                        echo "Échec du déploiement vers Nexus: ${e.message}"
+                         error "Le déploiement a échoué. Vérifiez le fichier settings.xml et la configuration Nexus."
+                    }
+                }
+            }
+         }
+
         // Uncomment this if you want to run tests
         
        /* stage('Test') {
