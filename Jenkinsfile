@@ -1,10 +1,11 @@
 pipeline {
     agent any
-    
+
     environment {
         JAVA_HOME = tool name: 'JAVA_HOME', type: 'jdk'
         M2_HOME = tool name: 'M2_HOME', type: 'maven'
         PATH = "${JAVA_HOME}/bin:${M2_HOME}/bin:${PATH}"
+        IMAGE_NAME = "itzmoetaz/4twin2-g3-kaddem"
     }
 
     stages {
@@ -63,11 +64,10 @@ pipeline {
             }
         }
 
-        stage('Docker Build & Run') {
+        stage('Docker Build') {
             steps {
                 script {
-                    def imageName = "moetazbenkhedher/4twin2-g3-kaddem"
-                    sh "docker build -t ${imageName}:latest ."
+                    sh "docker build -t ${IMAGE_NAME}:latest ."
                 }
             }
         }
@@ -77,12 +77,10 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh '''
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker push itzmoetaz/4twin2-g3-kaddem:latest
+                        docker push $IMAGE_NAME:latest
                     '''
                 }
             }
         }
-
-
     }
 }
