@@ -107,28 +107,43 @@ pipeline {
 
     }
      post {
-            success {
-                echo '✅ Pipeline succeeded!'
-                emailext(
-                    subject: "✅ Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                    body: """Good news Souha 🎉
+             success {
+                 echo '✅ Pipeline completed successfully!'
+                 emailext(
+                     subject: "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                     body: """Hello Souhail,
 
-    The build ${env.JOB_NAME} #${env.BUILD_NUMBER} was successful.
-    Check it here: ${env.BUILD_URL}""",
-                    to: 'souhailabdennebi2@gmail.com'
-                )
-            }
+     🎉 Your Jenkins build succeeded!
 
-            failure {
-                echo '❌ Pipeline failed.'
-                emailext(
-                    subject: "❌ Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                    body: """Oops 😔
+     Job: ${env.JOB_NAME}
+     Build Number: ${env.BUILD_NUMBER}
+     URL: ${env.BUILD_URL}
 
-    The build ${env.JOB_NAME} #${env.BUILD_NUMBER} failed.
-    Check the logs: ${env.BUILD_URL}""",
-                    to: 'souhailabdennebi2@gmail.com'
-                )
-            }
-        }
+     Regards,
+     Jenkins CI
+     """,
+                     to: 'souhailabdennebi2@gmail.com'
+                 )
+             }
+             failure {
+                 echo '❌ Pipeline failed.'
+                 emailext(
+                     subject: "❌ FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                     body: """Hello Souha,
+
+     😢 Your Jenkins build failed.
+
+     Job: ${env.JOB_NAME}
+     Build Number: ${env.BUILD_NUMBER}
+     URL: ${env.BUILD_URL}
+
+     Please check the logs for more details.
+
+     Regards,
+     Jenkins CI
+     """,
+                     to: 'souhailabdennebi2@gmail.com'
+                 )
+             }
+         }
 }
