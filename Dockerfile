@@ -1,18 +1,14 @@
-# Étape 1 : utiliser une image Java légère
+# Use official OpenJDK image as base
 FROM openjdk:17-jdk-slim
 
-# Variable d'environnement
-ENV SPRING_OUTPUT_ANSI_ENABLED=ALWAYS \
-    JAVA_OPTS=""
-
-# Créer un dossier dans le container
+# Set working directory
 WORKDIR /app
 
-# Copier le JAR compilé
+# Copy the jar file from Maven build
 COPY target/kaddem-0.0.1-SNAPSHOT.jar app.jar
 
-# Exposer le port utilisé par Spring Boot
-EXPOSE 8080
+# Expose port (adjust if different)
+EXPOSE 8089
 
-# Commande de démarrage
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+# Run the jar file
+ENTRYPOINT ["java", "-jar", "app.jar"]
