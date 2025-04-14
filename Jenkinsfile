@@ -118,6 +118,8 @@ pipeline {
         sh 'docker system prune -f'
     }
 }
+    }
+        
     post {
         always {
             sh 'docker logout'
