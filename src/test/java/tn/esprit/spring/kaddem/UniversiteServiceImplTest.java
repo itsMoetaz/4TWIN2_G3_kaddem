@@ -30,7 +30,7 @@ import java.util.Set;
 
 class UniversiteServiceImplTest {
 
- /*   @Mock
+   @Mock
     private UniversiteRepository universiteRepository;
 
     @Mock
@@ -137,5 +137,5 @@ class UniversiteServiceImplTest {
         // Assert
         assertEquals(1, result.size());
         verify(universiteRepository, times(1)).findById(1);
-    }*/
+    }
 }
