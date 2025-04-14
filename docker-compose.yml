@@ -5,10 +5,10 @@ services:
     image: mysql:5.7
     restart: unless-stopped
     environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ROOT_PASSWORD: malek
       MYSQL_DATABASE: kaddemdb
     ports:
-      - 3306:3306
+      - "3306:3306"
     volumes:
       - db:/var/lib/mysql
 
@@ -18,7 +18,7 @@ services:
     image: malekjendoubi/kaddem:1.0.0
     restart: on-failure
     ports:
-      - 8089:8089
+      - "8089:8089"
     environment:
       SPRING_APPLICATION_JSON: '{
         "spring.datasource.url"  : "jdbc:mysql://mysqldb:3306/kaddemdb?createDatabaseIfNotExist=true",
