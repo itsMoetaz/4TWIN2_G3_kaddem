@@ -37,18 +37,16 @@ pipeline {
             }
         }
 
-       stage('MVN SONARQUBE') {
-    steps {
-        withSonarQubeEnv('sq') {
-            withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-                sh '''
-                    mvn clean compile
-                    mvn sonar:sonar -DskipTests -Dsonar.java.binaries=target/classes -Dsonar.token=$SONAR_TOKEN
-                '''
+     stage('MVN SONARQUBE') {
+            steps {
+                withSonarQubeEnv('sonar') {
+                    sh '''
+                        mvn clean compile
+                        mvn sonar:sonar -DskipTests -Dsonar.java.binaries=target/classes
+                    '''
+                }
             }
         }
-    }
-}
       /*  stage('Deploy to Nexus') {
             steps {
                 script {
