@@ -4,8 +4,7 @@ pipeline {
         JAVA_HOME = tool name: 'JAVA_HOME', type: 'jdk'
         M2_HOME = tool name: 'M2_HOME', type: 'maven'
         PATH = "${JAVA_HOME}/bin:${M2_HOME}/bin:${PATH}:/usr/local/bin"
-        //NEXUS_REPO_URL = "http://127.0.0.1:8081/repository/maven-releases/"
-        NEXUS_REPO_URL = "http://127.0.0.1:8081/repository/maven-snapshots/"
+        NEXUS_REPO_URL = "http://192.168.33.10:8081/repository/maven-snapshots/"
         MAVEN_SETTINGS = "/usr/share/maven/conf/settings.xml"
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
         DOCKER_IMAGE_NAME = 'malekswissi11/malekswissi4twin2'
@@ -32,17 +31,20 @@ pipeline {
                 sh 'mvn clean compile || exit 1'
             }
         }
-          stage('Install') {
+        stage('Install') {
             steps {
                 sh 'mvn install'
             }
         }
-         stage('Deploy to Nexus') {
+        stage('Deploy to Nexus') {
             steps {
                 script {
                     try {
                         sh '''
-                            mvn deploy --settings ${MAVEN_SETTINGS} -DskipTests
+                            mvn deploy \
+                                --settings ${MAVEN_SETTINGS} \
+                                -DskipTests \
+                                -DaltDeploymentRepository=nexus-snapshots::default::${NEXUS_REPO_URL}
                         '''
                     } catch (Exception e) {
                         echo "Deployment to Nexus failed: ${e.message}"
@@ -53,13 +55,28 @@ pipeline {
         }
         stage('Docker Login') {
             steps {
-                sh 'echo "$DOCKERHUB_CREDENTIALS_PSW" | docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                    sh '''
+                        echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+                    '''
+                }
             }
         }
-         stage('Build Docker Image') {
+        stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
-                sh "docker tag ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ${DOCKER_IMAGE_NAME}:latest"
+                script {
+                    // Si vous utilisez l'Option 1 (COPY), cette étape est suffisante
+                    sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+
+                    // Si vous utilisez l'Option 2 (téléchargement depuis Nexus), ajoutez les identifiants Nexus
+                    /*
+                    withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                        sh "docker build --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+                    }
+                    */
+
+                    sh "docker tag ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ${DOCKER_IMAGE_NAME}:latest"
+                }
             }
         }
         stage('Push Docker Image to DockerHub') {
@@ -68,19 +85,17 @@ pipeline {
                 sh "docker push ${DOCKER_IMAGE_NAME}:latest"
             }
         }
-       stage('Deploy with Docker Compose') {
+        stage('Deploy with Docker Compose') {
             steps {
                 script {
                     sh """
-                    sed -i 's|image: malekswissi11/malekswissi4twin2 :.*|image: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}|' docker-compose.yml
+                        sed -i 's|image: malekswissi11/malekswissi4twin2:.*|image: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}|' docker-compose.yml
+                        docker-compose down
+                        docker-compose up -d
                     """
-
-                    sh 'docker-compose down'
-                    sh 'docker-compose up -d'
                 }
             }
         }
-      
         stage('Cleanup') {
             steps {
                 sh 'docker compose down || true'
