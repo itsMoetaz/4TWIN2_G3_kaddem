@@ -1,5 +1,6 @@
 package tn.esprit.spring.kaddem.controllers;
-import lombok.AllArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,39 +11,39 @@ import tn.esprit.spring.kaddem.services.IDepartementService;
 import java.util.List;
 
 @RestController
-@AllArgsConstructor
 @RequestMapping("/departement")
 public class DepartementRestController {
 
+	@Autowired
 	IDepartementService departementService;
 
-	@GetMapping("/retrieve-all-departements")
+	@GetMapping("/all")
 	public ResponseEntity<List<Departement>> getDepartements() {
 		List<Departement> listDepartements = departementService.retrieveAllDepartements();
 		return new ResponseEntity<>(listDepartements, HttpStatus.OK);
 	}
 
-	@GetMapping("/retrieve-departement/{departement-id}")
-	public ResponseEntity<Departement> retrieveDepartement(@PathVariable("departement-id") Integer departementId) {
-		Departement departement = departementService.retrieveDepartement(departementId);
+	@GetMapping("/retrieve/{id}")
+	public ResponseEntity<Departement> retrieveDepartement(@PathVariable("id") Integer id) {
+		Departement departement = departementService.retrieveDepartement(id);
 		return new ResponseEntity<>(departement, HttpStatus.OK);
 	}
 
-	@PostMapping("/add-departement")
+	@PostMapping("/add")
 	public ResponseEntity<DepartementDTO> addDepartement(@RequestBody DepartementDTO d) {
-		DepartementDTO departement = departementService.addDepartement(d);
-		return new ResponseEntity<>(departement, HttpStatus.CREATED);
+		DepartementDTO departementDTO = departementService.addDepartement(d);
+		return new ResponseEntity<>(departementDTO, HttpStatus.CREATED);
 	}
 
-	@DeleteMapping("/remove-departement/{departement-id}")
-	public ResponseEntity<Void> removeDepartement(@PathVariable("departement-id") Integer departementId) {
-		departementService.deleteDepartement(departementId);
+	@PutMapping("/update")
+	public ResponseEntity<DepartementDTO> updateDepartement(@RequestBody DepartementDTO d) {
+		DepartementDTO departementDTO = departementService.updateDepartement(d);
+		return new ResponseEntity<>(departementDTO, HttpStatus.OK);
+	}
+
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<Void> removeDepartement(@PathVariable("id") Integer id) {
+		departementService.deleteDepartement(id);
 		return new ResponseEntity<>(HttpStatus.OK);
-	}
-
-	@PutMapping("/update-departement")
-	public ResponseEntity<DepartementDTO> updateDepartement(@RequestBody DepartementDTO e) {
-		DepartementDTO departement = departementService.updateDepartement(e);
-		return new ResponseEntity<>(departement, HttpStatus.OK);
 	}
 }
