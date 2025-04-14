@@ -68,10 +68,7 @@ pipeline {
 
           stage('Deploy on Nexus') {
               steps {
-                  script {
-                      def ws = pwd()
-                      sh "mvn deploy -s ${ws}/maven-settings.xml -DskipTests"
-                  }
+                  sh "mvn deploy -s /var/lib/jenkins/jobs/kaddem/workspace/maven-settings.xml -DskipTests"
 
               }
           }
