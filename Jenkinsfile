@@ -37,6 +37,12 @@ pipeline {
             }
         }
 
+         stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
      stage('MVN SONARQUBE') {
             steps {
                 withSonarQubeEnv('sonar') {
