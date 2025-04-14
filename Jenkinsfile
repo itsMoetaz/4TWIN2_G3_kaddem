@@ -66,11 +66,7 @@ pipeline {
             }
         }
 
-         pipeline {
-             agent any
-
-             stages {
-                 stage('Deploy') {
+          stage('Deploy on Nexus') {
                      steps {
                          withCredentials([usernamePassword(
                              credentialsId: 'maven-repo-credentials',
@@ -87,8 +83,6 @@ pipeline {
                          }
                      }
                  }
-             }
-         }
     }
 
 
