@@ -32,9 +32,9 @@ pipeline {
                 sh 'mvn clean compile || exit 1'
             }
         }
-        stage('Install') {
+          stage('Install') {
             steps {
-                sh 'mvn install -DskipTests || exit 1'
+                sh 'mvn install'
             }
         }
         stage('Docker Login') {
@@ -42,7 +42,7 @@ pipeline {
                 sh 'echo "$DOCKERHUB_CREDENTIALS_PSW" | docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin'
             }
         }
-        stage('Build Docker Image') {
+         stage('Build Docker Image') {
             steps {
                 sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
                 sh "docker tag ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ${DOCKER_IMAGE_NAME}:latest"
@@ -50,28 +50,23 @@ pipeline {
         }
         stage('Push Docker Image to DockerHub') {
             steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
-                    sh "docker push ${DOCKER_IMAGE_NAME}:latest"
-                }
+                sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                sh "docker push ${DOCKER_IMAGE_NAME}:latest"
             }
         }
-        stage('Deploy with Docker Compose') {
+       stage('Deploy with Docker Compose') {
             steps {
                 script {
                     sh """
-                    sed -i 's|image: ${DOCKER_IMAGE_NAME}:.*|image: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}|' docker-compose.yml
+                    sed -i 's|image: malekswissi11/malekswissi4twin2 :.*|image: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}|' docker-compose.yml
                     """
-                    sh 'docker compose down || true'
-                    sh 'docker compose up -d'
+
+                    sh 'docker-compose down'
+                    sh 'docker-compose up -d'
                 }
             }
         }
-        stage('Check Logs') {
-            steps {
-                sh 'docker compose logs || true'
-            }
-        }
+      
         stage('Cleanup') {
             steps {
                 sh 'docker compose down || true'
