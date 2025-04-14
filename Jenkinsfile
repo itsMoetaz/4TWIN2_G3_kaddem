@@ -67,22 +67,17 @@ pipeline {
         }
 
           stage('Deploy on Nexus') {
-                     steps {
-                         withCredentials([usernamePassword(
-                             credentialsId: 'maven-repo-credentials',
-                             usernameVariable: 'MavenRepository',
-                             passwordVariable: '123456789')]) {
+              steps {
+                  withCredentials([usernamePassword(
+                      credentialsId: 'maven-repo-credentials',
+                      usernameVariable: 'MavenRepository',
+                      passwordVariable: '123456789')]) {
 
-                             // Option A: Using Config File Provider
-                             configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_SETTINGS')]) {
-                                 sh "mvn deploy -s $MAVEN_SETTINGS"
-                             }
-
-                             // OR Option B: Using local settings file
-                             // sh "mvn deploy -s maven-settings.xml"
-                         }
-                     }
-                 }
+                      // Use direct path to settings file
+                      sh "mvn deploy -s /var/lib/jenkins/.m2/settings.xml"
+                  }
+              }
+          }
     }
 
 
