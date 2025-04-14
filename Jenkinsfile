@@ -46,6 +46,29 @@ pipeline {
                 sh 'mvn clean compile'
             }
         }
+
+        stage('Install') {
+            steps {
+                sh 'mvn install'
+            }
+        }
+                
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        
+        stage('MVN SONARQUBE') {
+            steps {
+                withSonarQubeEnv('sq') {
+                    sh '''
+                        mvn clean compile
+                        mvn sonar:sonar -DskipTests -Dsonar.java.binaries=target/classes
+                    '''
+                }
+            }
+        }
                  
         // stage('Deploy to Nexus') {
         //     steps {
@@ -67,26 +90,7 @@ pipeline {
         //     }
         // }
         
-        // stage('Test') {
-        //     steps {
-        //         sh 'mvn test'
-        //     }
-        // }
-        stage('Install') {
-            steps {
-                sh 'mvn install'
-            }
-        }
-        stage('MVN SONARQUBE') {
-            steps {
-                withSonarQubeEnv('sq') {
-                    sh '''
-                        mvn clean compile
-                        mvn sonar:sonar -DskipTests -Dsonar.java.binaries=target/classes
-                    '''
-                }
-            }
-        }
+        
 
         stage('Docker Login') {
             steps {
