@@ -111,6 +111,13 @@ pipeline {
         }
     }
 }
+
+        stage('Cleanup') {
+    steps {
+        sh 'docker compose down || true'
+        sh 'docker system prune -f'
+    }
+}
     post {
         always {
             sh 'docker logout'
