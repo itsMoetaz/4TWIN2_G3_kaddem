@@ -97,26 +97,27 @@ pipeline {
 
 
         
-        
-    stage('Deploy with Docker Compose') {
+  stage('Deploy with Docker Compose') {
             steps {
                 script {
-                    sh """
-                    sed -i 's|image: malekswissi11/testdevops :.*|image: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}|' docker-compose.yml
-                    """
-
-                    sh 'docker-compose down'
-                    sh 'docker-compose up -d'
+                    try {
+                        sh """
+                            sed -i 's|image: malekswissi11/testdevops :.*|image: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}|' docker-compose.yml
+                            docker compose down || true
+                            docker compose up -d
+                        """
+                    } catch (Exception e) {
+                        echo "Docker Compose deployment failed: ${e}"
+                    }
                 }
             }
         }
-
         stage('Cleanup') {
-    steps {
-        sh 'docker compose down || true'
-        sh 'docker system prune -f'
-    }
-}
+            steps {
+                sh 'docker compose down || true'
+                sh 'docker system prune -f'
+            }
+        }
     }
         
     post {
