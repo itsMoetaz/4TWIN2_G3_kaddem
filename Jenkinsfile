@@ -9,6 +9,7 @@ pipeline {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
 
         DOCKER_IMAGE_NAME = 'malekswissi11/malekswissi4twin2'
+   
         DOCKER_IMAGE_TAG = "${BUILD_NUMBER}"
     }
     stages {
@@ -91,7 +92,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    sed -i 's|image: saifmed/saifmeddeb4twin2:.*|image: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}|' docker-compose.yml
+                    sed -i 's|image: malekswissi11/malekswissi4twin2:.*|image: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}|' docker-compose.yml
                     """
 
                     sh 'docker-compose down'
