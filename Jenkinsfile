@@ -36,6 +36,17 @@ pipeline {
                 sh 'mvn install'
             }
         }
+
+        stage('MVN SONARQUBE') {
+            steps {
+                withSonarQubeEnv('sq') {
+                    sh '''
+                        mvn clean compile
+                        mvn sonar:sonar -DskipTests -Dsonar.java.binaries=target/classes
+                    '''
+                }
+            }
+        }
       /*  stage('Deploy to Nexus') {
             steps {
                 script {
