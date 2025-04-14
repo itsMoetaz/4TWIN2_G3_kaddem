@@ -25,5 +25,14 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+       mysql-exporter:
+    image: prom/mysqld-exporter
+    environment:
+      - DATA_SOURCE_NAME=root:root@tcp(db:3306)/  # Remplacez `root:root` par vos identifiants si nécessaire
+    ports:
+      - "9104:9104"  # Port par défaut pour l'exportateur
+    depends_on:
+      - db
+
 volumes:
   mysql_data:
