@@ -66,27 +66,14 @@ pipeline {
             }
         }
 
-        stage('Nexus Deployment') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-                    sh 'mvn deploy -Dmaven.test.skip=true -Drepository.username=$NEXUS_USERNAME -Drepository.password=$NEXUS_PASSWORD'
-                }
-            }
-        }
+         stage('Deploy JAR to Nexus') {
+                           steps {
+
+                                   sh "mvn deploy -Dmaven.test.skip=true"
+
+                           }
+                       }
     }
 
-    post {
-        always {
-            emailext (
-                subject: "Build Status: ${currentBuild.fullDisplayName}",
-                body: """
-                    <p>Build Status: ${currentBuild.currentResult}</p>
-                    <p>Build Number: ${env.BUILD_NUMBER}</p>
-                    <p>Check the build console output at: ${env.BUILD_URL}</p>
-                """,
-                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
-                to: 'souhailabdennebi2@gmail.com'
-            )
-        }
-    }
+
 }
