@@ -78,23 +78,32 @@ pipeline {
           }
 
           stage('Build Docker Image') {
-                      steps {
-                          script {
-                              // Build the Docker image
-                              sh 'cd backend && docker build -t ${DOCKER_IMAGE} .'
-                          }
-                      }
+              steps {
+                  script {
+                      sh 'docker build -t souhail210301/4twin2-g3-kaddem:latest .'
                   }
+              }
+          }
 
-                  stage('Push Docker Image') {
-                      steps {
-                          script {
-                              // Push Docker image to Docker Hub
-                              sh 'docker login -u souhail210301 -p ${DOCKER_PASSWORD}'
-                              sh 'docker push ${DOCKER_IMAGE}'
+          stage('Push to Docker Hub') {
+              steps {
+                  script {
+                      def imageExists = sh(
+                          script: 'curl -s -o /dev/null -w "%{http_code}" -u $DOCKER_USERNAME:$DOCKER_PASSWORD "https://hub.docker.com/v2/repositories/souhail210301/4twin2-g3-kaddem/tags/latest/"',
+                          returnStdout: true
+                      ).trim()
+
+                      if (imageExists != '200') {
+                          withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                              sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                              sh 'docker push souhail210301/4twin2-g3-kaddem:latest'
                           }
+                      } else {
+                          echo 'Docker image already exists on Docker Hub; skipping push.'
                       }
                   }
+              }
+          }
 
     }
     post {
