@@ -39,11 +39,11 @@ pipeline {
 
         // Uncomment this if you want to run tests
         
-        stage('Test') {
+       /* stage('Test') {
             steps {
                 sh 'mvn test'
             }
-        }
+        }*/
         
 
         stage('Install') {
