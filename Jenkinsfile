@@ -36,7 +36,7 @@ pipeline {
                 sh 'mvn install'
             }
         }
-        stage('Deploy to Nexus') {
+      /*  stage('Deploy to Nexus') {
             steps {
                 script {
                     try {
@@ -52,7 +52,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
         stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
