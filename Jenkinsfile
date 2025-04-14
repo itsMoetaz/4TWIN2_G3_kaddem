@@ -7,7 +7,7 @@ pipeline {
         NEXUS_REPO_URL = "http://192.168.33.10:8081/repository/maven-snapshots/"
         MAVEN_SETTINGS = "/usr/share/maven/conf/settings.xml"
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
-        DOCKER_IMAGE_NAME = 'malekswissi11/Malekswissi4twin2'
+        DOCKER_IMAGE_NAME = 'malekswissi11/malekswissi4twin2'
         DOCKER_IMAGE_TAG = "${BUILD_NUMBER}"
     }
     stages {
