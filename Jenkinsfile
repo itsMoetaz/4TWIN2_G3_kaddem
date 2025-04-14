@@ -98,28 +98,21 @@ pipeline {
 
     post {
         success {
-            emailext(
-                subject: "✅ Jenkins Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """<p>Good news! The build was successful.</p>
-                         <p><b>Project:</b> ${env.JOB_NAME}<br>
-                         <b>Build #:</b> ${env.BUILD_NUMBER}</p>
-                         <p><a href="${env.BUILD_URL}">View Build</a></p>""",
-                to: 'moetaz.khedher2001@gmail.com',
-                mimeType: 'text/html',
-                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
-            )
-        }
-        failure {
-            emailext(
-                subject: "❌ Jenkins Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """<p><b>Project:</b> ${env.JOB_NAME}<br>
-                         <b>Build #:</b> ${env.BUILD_NUMBER}</p>
-                         <p>Status: FAILED</p>
-                         <p><a href="${env.BUILD_URL}">View Build</a></p>""",
-                to: 'moetaz.khedher2001@gmail.com',
-                mimeType: 'text/html',
-                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
-            )
+                mail to: 'moetaz.khedher2001@gmail.com',
+                     subject: "✅ Jenkins SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                     body: """Good news! The build was successful.
+                              Project: ${env.JOB_NAME}
+                              Build #: ${env.BUILD_NUMBER}
+                              View Build: ${env.BUILD_URL}"""
+            }
+            failure {
+                mail to: 'moetaz.khedher2001@gmail.com',
+                     subject: "❌ Jenkins FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                     body: """Project: ${env.JOB_NAME}
+                              Build #: ${env.BUILD_NUMBER}
+                              Status: FAILED
+                              View Build: ${env.BUILD_URL}"""
+            }
         }
     }
 }
