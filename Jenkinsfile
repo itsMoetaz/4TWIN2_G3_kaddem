@@ -67,16 +67,7 @@ stage('MVN SONARQUBE') {
                         }
                     }
                 }
-          stage('Docker Compose Up') {
-            steps {
-                script {
-                    echo '🛠️ Stopping any existing containers...'
-                    sh 'docker compose down || true'
-
-                    echo '🚀 Building and starting containers with Docker Compose...'
-                    sh 'docker compose up -d --build'
-                }
-            }
+         
         }
     }
 }
