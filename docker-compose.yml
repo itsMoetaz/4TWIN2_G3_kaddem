@@ -16,7 +16,7 @@ services:
   backend:
     image: souhail210301/4twin2-g3-kaddem:latest
     ports:
-      - "8089:8089"
+      - "8085:8085"
 
 
   app:
