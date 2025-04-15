@@ -13,6 +13,7 @@ import tn.esprit.spring.kaddem.services.UniversiteServiceImpl;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -53,7 +54,7 @@ class UniversiteServiceUnitTest {
         assertEquals("george", universiteById.getNomUniv());
     }
 
-    @Test
+ /*   @Test
     void testGetInvalidUniversiteById() {
         when(universiteRepository.findById(17)).thenThrow(new RuntimeException("Universite Not Found with ID"));
 
@@ -62,9 +63,31 @@ class UniversiteServiceUnitTest {
         });
 
         assertTrue(exception.getMessage().contains("Universite Not Found with ID"));
+    }*/
+
+    @Test
+    void testGetInvalidUniversiteById() {
+        when(universiteRepository.findById(17)).thenReturn(Optional.empty());
+        Exception exception = assertThrows(NoSuchElementException.class, () -> {
+            iUniversiteService.retrieveUniversite(17);
+        });
+        assertTrue(exception.getMessage().contains("No value present"));
     }
 
+    @Test
+    void testCreateUniversite() {
+        Universite universite = new Universite(12, "john");
+        when(universiteRepository.save(any(Universite.class))).thenReturn(universite);
+        Universite createdUniversite = iUniversiteService.addUniversite(universite);
+        verify(universiteRepository, times(1)).save(universite);
+        ArgumentCaptor<Universite> universiteArgumentCaptor = ArgumentCaptor.forClass(Universite.class);
+        verify(universiteRepository).save(universiteArgumentCaptor.capture());
+        Universite universiteCreated = universiteArgumentCaptor.getValue();
+        assertEquals("john", universiteCreated.getNomUniv());
+        assertEquals("john", createdUniversite.getNomUniv());
+    }
 
+    /*
     @Test
     void testCreateUniversite() {
         Universite universite = new Universite(12, "john");
@@ -75,7 +98,7 @@ class UniversiteServiceUnitTest {
         Universite universiteCreated = universiteArgumentCaptor.getValue();
         assertNotNull(universiteCreated.getIdUniv());
         assertEquals("john", universiteCreated.getNomUniv());
-    }
+    }*/
 
     @Test
     void testDeleteuniversite() {
@@ -91,4 +114,7 @@ class UniversiteServiceUnitTest {
         assertNotNull(deletedUniversite);
         assertEquals(13, deletedUniversite.getIdUniv());
     }
+
+
+
 }
