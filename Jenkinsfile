@@ -69,5 +69,5 @@ stage('MVN SONARQUBE') {
                 }
          
         }
-    }
+    
 }
