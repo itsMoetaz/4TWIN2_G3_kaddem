@@ -53,7 +53,6 @@ public class EtudiantRestController {
 		etudiantService.assignEtudiantToDepartement(etudiantId, departementId);
     }
 //addAndAssignEtudiantToEquipeAndContract(Etudiant e, Integer idContrat, Integer idEquipe)
-    /* Ajouter un étudiant tout en lui affectant un contrat et une équipe */
     @PostMapping("/add-assign-Etudiant/{idContrat}/{idEquipe}")
     @ResponseBody
     public Etudiant addEtudiantWithEquipeAndContract(@RequestBody Etudiant e, @PathVariable("idContrat") Integer idContrat, @PathVariable("idEquipe") Integer idEquipe) {

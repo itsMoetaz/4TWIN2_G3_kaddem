@@ -26,14 +26,11 @@ public class Etudiant implements Serializable{
     @ManyToOne
     @JsonIgnore
     private Departement departement;
-  //  @ManyToMany(cascade =CascadeType.ALL)
     @ManyToMany(mappedBy="etudiants")
 
     @JsonIgnore
-  //  private Set<Equipe> equipes ;
     private List<Equipe> equipes ;
     public Etudiant() {
-        // TODO Auto-generated constructor stub
     }
 
     public Etudiant(String nomE, String prenomE) {
