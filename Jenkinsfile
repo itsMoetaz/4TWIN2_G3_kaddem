@@ -13,7 +13,11 @@ pipeline {
                     url: 'https://github.com/itsMoetaz/4TWIN2_G3_kaddem.git'
             }
         }
-
+    stage('Test Stage') {
+            steps {
+                sh 'mvn test'
+            }
+        }
         stage('Compile Stage') {
             steps {
                 sh 'mvn clean compile'
