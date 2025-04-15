@@ -1,0 +1,50 @@
+<div class="container mt-4">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <h2 class="h4 mb-0">Liste des Équipes</h2>
+      <a routerLink="/ajouter-equipe" class="btn btn-light">
+        <i class="fas fa-plus me-2"></i>Ajouter une Équipe
+      </a>
+    </div>
+    
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th scope="col" class="text-center">#ID</th>
+              <th scope="col">Nom</th>
+              <th scope="col">Niveau</th>
+              <th scope="col" class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let equipe of equipes">
+              <td class="text-center">{{ equipe.idEquipe }}</td>
+              <td>{{ equipe.nomEquipe }}</td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'bg-success': equipe.niveau === 'EXPERT',
+                  'bg-warning': equipe.niveau === 'SENIOR',
+                  'bg-info': equipe.niveau === 'JUNIOR'
+                }">
+                  {{ equipe.niveau }}
+                </span>
+              </td>
+              <td class="text-center">
+                <div class="btn-group" role="group">
+                <button class="btn btn-outline-primary btn-sm" [routerLink]="['/equipes/edit', equipe.idEquipe]">
+  <i class="fas fa-edit"></i>
+</button>
+                  <button class="btn btn-outline-danger btn-sm" (click)="deleteEquipe(equipe.idEquipe!)" title="Supprimer">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

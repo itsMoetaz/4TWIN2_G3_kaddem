@@ -13,7 +13,15 @@ services:
       - "${MYSQLDB_LOCAL_PORT}:${MYSQLDB_DOCKER_PORT}"
     volumes:
       - db:/var/lib/mysql
+  backend:
+    image: souhail210301/4twin2-g3-kaddem:latest
+    ports:
+      - "8089:8089"
 
+  frontend:
+    image: souhail210301/kaddem-frontend:latest
+    ports:
+      - "4200:80"
   app:
     build: ./
     depends_on:
