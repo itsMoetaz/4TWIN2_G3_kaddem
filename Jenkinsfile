@@ -99,7 +99,7 @@ pipeline {
             post {
                 success {
                     mail to: 'moetaz.khedher2001@gmail.com',
-                        subject: "✅ Jenkins SUCCESS : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                        subject: "✅ Jenkins SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                         body: """Good news! The build was successful.
                                 Project: ${env.JOB_NAME}
                                 Build #: ${env.BUILD_NUMBER}
