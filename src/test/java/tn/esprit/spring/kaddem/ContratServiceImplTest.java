@@ -1,137 +1,113 @@
 package tn.esprit.spring.kaddem;
 
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import tn.esprit.spring.kaddem.entities.Contrat;
-import tn.esprit.spring.kaddem.entities.Etudiant;
+import tn.esprit.spring.kaddem.entities.Specialite;
 import tn.esprit.spring.kaddem.repositories.ContratRepository;
-import tn.esprit.spring.kaddem.repositories.EtudiantRepository;
 import tn.esprit.spring.kaddem.services.ContratServiceImpl;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-class ContratServiceImplTest {
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+public class ContratServiceImplTest {
 
     @Mock
     private ContratRepository contratRepository;
-
-    @Mock
-    private EtudiantRepository etudiantRepository;
 
     @InjectMocks
     private ContratServiceImpl contratService;
 
     private Contrat contrat;
-    private Etudiant etudiant;
 
     @BeforeEach
-    void setUp() {
-        // Initialisation des mocks
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
-
-        // Création des objets de test
-        etudiant = new Etudiant();
-        etudiant.setNomE("Dupont");
-        etudiant.setPrenomE("Jean");
 
         contrat = new Contrat();
         contrat.setIdContrat(1);
-        contrat.setSpecialite(tn.esprit.spring.kaddem.entities.Specialite.IA);
-        contrat.setEtudiant(etudiant);
-        contrat.setDateFinContrat(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 30)); // 30 jours plus tard
+        contrat.setDateDebutContrat(new Date());
+        contrat.setDateFinContrat(new Date(System.currentTimeMillis() + 86400000L * 30)); // 30 jours
+        contrat.setSpecialite(Specialite.IA);
+        contrat.setArchive(false);
+        contrat.setMontantContrat(1500);
     }
 
     @Test
-    void testAddContrat() {
-        // Arrange
+    public void testAddContrat() {
         when(contratRepository.save(any(Contrat.class))).thenReturn(contrat);
 
-        // Act
-        Contrat addedContrat = contratService.addContrat(contrat);
+        Contrat saved = contratService.addContrat(contrat);
 
-        // Assert
-        assertNotNull(addedContrat);
-        assertEquals(1, addedContrat.getIdContrat());
-        verify(contratRepository, times(1)).save(any(Contrat.class));
+        assertNotNull(saved);
+        assertEquals(1, saved.getIdContrat());
+        verify(contratRepository, times(1)).save(contrat);
     }
 
     @Test
-    void testUpdateContrat() {
-        // Arrange
+    public void testUpdateContrat() {
         when(contratRepository.save(any(Contrat.class))).thenReturn(contrat);
 
-        // Act
-        Contrat updatedContrat = contratService.updateContrat(contrat);
+        Contrat updated = contratService.updateContrat(contrat);
 
-        // Assert
-        assertNotNull(updatedContrat);
-        assertEquals(1, updatedContrat.getIdContrat());
-        verify(contratRepository, times(1)).save(any(Contrat.class));
+        assertNotNull(updated);
+        assertEquals(1500, updated.getMontantContrat());
+        verify(contratRepository, times(1)).save(contrat);
     }
 
     @Test
-    void testRetrieveContrat() {
-        // Arrange
+    public void testRetrieveContrat() {
         when(contratRepository.findById(1)).thenReturn(Optional.of(contrat));
 
-        // Act
-        Contrat foundContrat = contratService.retrieveContrat(1);
+        Contrat retrieved = contratService.retrieveContrat(1);
 
-        // Assert
-        assertNotNull(foundContrat);
-        assertEquals(1, foundContrat.getIdContrat());
+        assertNotNull(retrieved);
+        assertEquals(1, retrieved.getIdContrat());
         verify(contratRepository, times(1)).findById(1);
     }
 
     @Test
-    void testRemoveContrat() {
-        // Arrange
+    public void testRetrieveContratNotFound() {
+        when(contratRepository.findById(1)).thenReturn(Optional.empty());
+
+        Contrat retrieved = contratService.retrieveContrat(1);
+
+        assertNull(retrieved);
+        verify(contratRepository, times(1)).findById(1);
+    }
+
+    @Test
+    public void testRemoveContrat() {
         when(contratRepository.findById(1)).thenReturn(Optional.of(contrat));
 
-        // Act
         contratService.removeContrat(1);
 
-        // Assert
         verify(contratRepository, times(1)).delete(contrat);
     }
 
     @Test
-    void testAffectContratToEtudiant() {
-        // Arrange
-        when(etudiantRepository.findByNomEAndPrenomE("Dupont", "Jean")).thenReturn(etudiant);
-        when(contratRepository.findByIdContrat(1)).thenReturn(contrat);
-        when(contratRepository.save(any(Contrat.class))).thenReturn(contrat);
+    public void testRetrieveAllContrats() {
+        List<Contrat> contrats = Arrays.asList(contrat, contrat);
+        when(contratRepository.findAll()).thenReturn(contrats);
 
-        // Act
-        Contrat updatedContrat = contratService.affectContratToEtudiant(1, "Dupont", "Jean");
+        List<Contrat> result = contratService.retrieveAllContrats();
 
-        // Assert
-        assertNotNull(updatedContrat);
-        assertEquals(etudiant, updatedContrat.getEtudiant());
-        verify(contratRepository, times(1)).save(any(Contrat.class));
+        assertEquals(2, result.size());
+        verify(contratRepository, times(1)).findAll();
     }
 
     @Test
-    void testNbContratsValides() {
-        // Arrange
-        Date startDate = new Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24 * 10); // 10 jours avant
-        Date endDate = new Date(System.currentTimeMillis());
-        when(contratRepository.getnbContratsValides(startDate, endDate)).thenReturn(5);
+    public void testNbContratsValides() {
+        Date start = new Date(System.currentTimeMillis() - 86400000L * 10); // il y a 10 jours
+        Date end = new Date();
+        when(contratRepository.getnbContratsValides(start, end)).thenReturn(3);
 
-        // Act
-        Integer nbContratsValides = contratService.nbContratsValides(startDate, endDate);
+        Integer count = contratService.nbContratsValides(start, end);
 
-        // Assert
-        assertNotNull(nbContratsValides);
-        assertEquals(5, nbContratsValides);
-        verify(contratRepository, times(1)).getnbContratsValides(startDate, endDate);
+        assertEquals(3, count);
+        verify(contratRepository, times(1)).getnbContratsValides(start, end);
     }
-
-
 }
