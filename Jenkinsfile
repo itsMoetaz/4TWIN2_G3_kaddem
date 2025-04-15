@@ -6,12 +6,13 @@ pipeline {
         maven 'M2_HOME'
     }
 
-     environment {
-            DOCKER_IMAGE = 'souhail210301/4twin2-g3-kaddem:latest'
-        }
+    environment {
+        BACKEND_IMAGE = 'souhail210301/4twin2-g3-kaddem:latest'
+        FRONTEND_IMAGE = 'souhail210301/4twin2-g3-kaddem-front:latest'
+    }
 
     stages {
-        stage('GIT') {
+        stage('Checkout Backend') {
             steps {
                 dir('backend') {
                     git branch: 'AbdennebiSouhail-4TWIN2-G3',
@@ -20,49 +21,34 @@ pipeline {
             }
         }
 
-        stage('Maven Clean Compile') {
+        stage('Checkout Frontend') {
             steps {
-                dir('backend') {
-                    sh 'mvn clean'
-                    echo 'Running Maven Compile'
-                    sh 'mvn compile'
+                dir('frontend') {
+                    git branch: 'main',
+                        url: 'https://github.com/souhail210301/kaddem-angular-frontend.git'
                 }
             }
         }
 
-        stage('Tests - JUnit/Mockito') {
+        stage('Build Backend') {
             steps {
                 dir('backend') {
-                    sh 'mvn test'
+                    sh 'mvn clean install -DskipTests'
                 }
-            }
-        }
-        
-        stage('Build package') {
-            steps {
-                sh 'mvn package'
-            }
-        }
-        
-        stage('Maven Install') {
-            steps {
-                sh 'mvn install'
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    def scannerHome = tool 'scanner' // Make sure 'scanner' is configured in Jenkins
-                    withSonarQubeEnv('sonar') { // Using your server ID 'sonar'
+                    def scannerHome = tool 'scanner'
+                    withSonarQubeEnv('sonar') {
                         dir('backend') {
                             sh """
-                            ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=kaddem \
-                            -Dsonar.projectName='kaddem' \
-                            -Dsonar.sources=src/main \
-                            -Dsonar.java.binaries=target/classes \
-                            -Dsonar.scm.provider=git
+                                ${scannerHome}/bin/sonar-scanner \
+                                -Dsonar.projectKey=kaddem \
+                                -Dsonar.sources=src/main \
+                                -Dsonar.java.binaries=target/classes
                             """
                         }
                     }
@@ -70,60 +56,56 @@ pipeline {
             }
         }
 
-          stage('Deploy on Nexus') {
-              steps {
-                  sh "mvn deploy -s /var/lib/jenkins/jobs/kaddem/workspace/maven-settings.xml -DskipTests"
+        stage('Deploy to Nexus') {
+            steps {
+                dir('backend') {
+                    sh "mvn deploy -s /var/lib/jenkins/jobs/kaddem/workspace/maven-settings.xml -DskipTests"
+                }
+            }
+        }
 
-              }
-          }
+        stage('Build Backend Docker Image') {
+            steps {
+                dir('backend') {
+                    sh 'docker build -t $BACKEND_IMAGE .'
+                }
+            }
+        }
 
-          stage('Build Docker Image') {
-              steps {
-                  script {
-                      sh 'docker build -t souhail210301/4twin2-g3-kaddem:latest .'
-                  }
-              }
-          }
+        stage('Build Frontend Docker Image') {
+            steps {
+                dir('frontend') {
+                    sh 'docker build -t $FRONTEND_IMAGE .'
+                }
+            }
+        }
 
-          stage('Push to Docker Hub') {
-              steps {
-                  script {
-                      def imageExists = sh(
-                          script: 'curl -s -o /dev/null -w "%{http_code}" -u $DOCKER_USERNAME:$DOCKER_PASSWORD "https://hub.docker.com/v2/repositories/souhail210301/4twin2-g3-kaddem/tags/latest/"',
-                          returnStdout: true
-                      ).trim()
+        stage('Push Docker Images') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh '''
+                        echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+                        docker push $BACKEND_IMAGE
+                        docker push $FRONTEND_IMAGE
+                    '''
+                }
+            }
+        }
 
-                      if (imageExists != '200') {
-                          withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                              sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-                              sh 'docker push souhail210301/4twin2-g3-kaddem:latest'
-                          }
-                      } else {
-                          echo 'Docker image already exists on Docker Hub; skipping push.'
-                      }
-                  }
-              }
-          }
-           stage('Docker Compose Up') {
-                      steps {
-                          script {
-                              echo '🛠️ Stopping any existing containers...'
-                              sh 'docker compose down || true'
+        stage('Docker Compose Up') {
+            steps {
+                sh 'docker compose down || true'
+                sh 'docker compose up -d --build'
+            }
+        }
+    }
 
-                              echo '🚀 Building and starting containers with Docker Compose...'
-                              sh 'docker compose up -d --build'
-                          }
-                      }
-                  }
-              }
-
-
-      post {
-             success {
-                 echo 'Pipeline succeeded!'
-             }
-             failure {
-                 echo 'Pipeline failed!'
-             }
-         }
-         }
+    post {
+        success {
+            echo '✅ Pipeline completed successfully!'
+        }
+        failure {
+            echo '❌ Pipeline failed!'
+        }
+    }
+}
