@@ -8,6 +8,7 @@ pipeline {
 
      environment {
             DOCKER_IMAGE = 'souhail210301/4twin2-g3-kaddem:latest'
+            FRONTEND_IMAGE = 'souhail210301/4twin2-g3-kaddem-front:latest'
         }
 
     stages {
@@ -18,6 +19,13 @@ pipeline {
                         url: 'https://github.com/itsMoetaz/4TWIN2_G3_kaddem.git'
                 }
             }
+            steps {
+                 dir('frontend') {
+                    git branch: 'AbdennebiSouhail-4TWIN2-G3',
+                        url: 'https://github.com/itsMoetaz/4TWIN2_G3_kaddem.git'
+                            }
+                        }
+
         }
 
         stage('Maven Clean Compile') {
@@ -84,6 +92,13 @@ pipeline {
                   }
               }
           }
+           stage('Build Frontend Docker Image') {
+                      steps {
+                          dir('frontend') {
+                              sh 'docker build -t $FRONTEND_IMAGE .'
+                          }
+                      }
+                  }
 
           stage('Push to Docker Hub') {
               steps {
@@ -97,6 +112,7 @@ pipeline {
                           withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                               sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                               sh 'docker push souhail210301/4twin2-g3-kaddem:latest'
+                              sh 'docker push $FRONTEND_IMAGE'
                           }
                       } else {
                           echo 'Docker image already exists on Docker Hub; skipping push.'
