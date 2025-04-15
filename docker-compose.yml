@@ -1,28 +1,43 @@
 version: "3.8"
 
 services:
-  db:
-    image: mysql:5.7
+  mysqldb:
+    image: mysql:8.0 # Mise à jour vers MySQL 8.0 pour correspondre au connecteur mysql-connector-j-8.0.31
+    restart: unless-stopped
     environment:
-      #MYSQL_ROOT_PASSWORD: root
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ROOT_PASSWORD: malek
       MYSQL_DATABASE: kaddemdb
     ports:
-      - "3307:3306"
+      - "3306:3306" # Expose le port 3306 pour un accès externe si nécessaire
     volumes:
-      - mysql_data:/var/lib/mysql
+      - db:/var/lib/mysql
+    networks:
+      - kaddem-network
 
-  backend:
-    image: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}  # Utilisation de la variable dynamique du pipeline Jenkins
+  app-kaddem:
     depends_on:
-      - db
+      - mysqldb # Assure que MySQL démarre avant l'application
+    image: malekswissi11/testdevops:${DOCKER_IMAGE_TAG} # Utilise l'image de votre pipeline Jenkins
+    restart: on-failure
     ports:
-      - "8082:8082"
+      - "8082:8080" # Mappe le port 8082 de l'hôte au port 8080 du conteneur (port par défaut de Spring Boot)
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306kaddemdb
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: ""
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_APPLICATION_JSON: '{
+        "spring.datasource.url": "jdbc:mysql://mysqldb:3306/kaddemdb?createDatabaseIfNotExist=true",
+        "spring.datasource.username": "root",
+        "spring.datasource.password": "malek",
+        "spring.jpa.properties.hibernate.dialect": "org.hibernate.dialect.MySQL8Dialect",
+        "spring.jpa.hibernate.ddl-auto": "update",
+        "server.port": "8080"
+      }'
+    stdin_open: true
+    tty: true
+    networks:
+      - kaddem-network
 
 volumes:
-  mysql_data:
+  db:
+
+networks:
+  kaddem-network:
+    driver: bridge
