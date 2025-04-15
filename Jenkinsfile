@@ -19,12 +19,7 @@ pipeline {
                         url: 'https://github.com/itsMoetaz/4TWIN2_G3_kaddem.git'
                 }
             }
-            steps {
-                 dir('frontend') {
-                    git branch: 'AbdennebiSouhail-4TWIN2-G3',
-                        url: 'https://github.com/itsMoetaz/4TWIN2_G3_kaddem.git'
-                            }
-                        }
+
 
         }
 
