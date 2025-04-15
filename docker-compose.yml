@@ -4,7 +4,8 @@ services:
   db:
     image: mysql:5.7
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      #MYSQL_ROOT_PASSWORD: root
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       MYSQL_DATABASE: kaddemdb
     ports:
       - "3307:3306"
@@ -20,7 +21,7 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306kaddemdb
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: null
+      SPRING_DATASOURCE_PASSWORD: ""
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
 
 volumes:
