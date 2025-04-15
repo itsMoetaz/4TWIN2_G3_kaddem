@@ -1,6 +1,5 @@
 package tn.esprit.spring.kaddem.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,8 +13,12 @@ import java.util.List;
 @RequestMapping("/departement")
 public class DepartementRestController {
 
-	@Autowired
-	IDepartementService departementService;
+	private final IDepartementService departementService;
+
+	// ✅ Injection via constructeur (meilleure pour les tests et la clarté)
+	public DepartementRestController(IDepartementService departementService) {
+		this.departementService = departementService;
+	}
 
 	@GetMapping("/all")
 	public ResponseEntity<List<Departement>> getDepartements() {
