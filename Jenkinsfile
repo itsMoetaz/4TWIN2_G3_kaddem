@@ -25,7 +25,7 @@ pipeline {
             steps {
                 dir('frontend') {
                     git branch: 'main',
-                        url: 'https://github.com/souhail210301/kaddem-angular-frontend.git'
+                        url: 'https://github.com/itsMoetaz/4TWIN2_G3_kaddem.git'
                 }
             }
         }
